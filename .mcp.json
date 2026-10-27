@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "figma-bridge": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@gethopp/figma-mcp-bridge@0.0.25"]
+    }
+  }
+}
