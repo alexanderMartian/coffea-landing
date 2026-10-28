@@ -11,13 +11,21 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 - Business: Coffea — coffee shop / café (fictional, template)
 - Figma file: Coffea - Free Responsive Coffee Shop Website Template (Community)   <!-- figma-import checks it against the file open in Figma -->
 - Figma link: <add the link of the copy> — a copy in my drafts, read through the Figma MCP Bridge plugin
-- Design frame: <node-id>, <W>×<H>   <!-- filled by figma-import step 1 -->
-- Phase: scaffold   <!-- scaffold | build | qa | done -->
-- Tokens: ⬜   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
+- Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
+- Phase: build   <!-- scaffold | build | qa | done -->
+- Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
 
 | # | Section | id | Figma node | Status | Notes |
 |---|---|---|---|---|---|
-| 1 | <filled by figma-import step 1> | `<id>` | <node-id> | ⬜ | |
+| 0 | Header | `header` | `2013:2` | ⬜ | Nav bar, floats over Hero; in app/layout.tsx |
+| 1 | Hero | `hero` | `2013:3` | ✅ | font diff ~3.6% (Playfair rendering) |
+| 2 | Categories | `categories` | `2013:4` | ⬜ | |
+| 3 | Coffee Menu | `coffee-menu` | `2013:5` | ⬜ | Shared card component with Dessert Menu |
+| 4 | Dessert Menu | `dessert-menu` | `2013:6` | ⬜ | Shared card component with Coffee Menu |
+| 5 | Promo | `promo` | `2013:7` | ⬜ | |
+| 6 | Testimonials | `testimonials` | `2013:8` | ⬜ | |
+| 7 | Newsletter | `newsletter` | `0:239` | ⬜ | |
+| 8 | Footer | `footer` | `2013:9` | ⬜ | |
 
 Status: ⬜ not started · 🔄 in progress · ✅ done (spec match at 1920 + rules OK at 360–2560 + lint/typecheck + committed)
 
