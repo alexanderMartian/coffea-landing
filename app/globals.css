@@ -58,6 +58,15 @@
   /* Type scale — fluid 360 → 1920 */
   --text-display: clamp(2.25rem, 1.731rem + 2.308vw, 4.5rem);
   --text-display--line-height: 1.139;
+
+  /* Type scale — section headings */
+  --text-h3: clamp(1.25rem, 1.077rem + 0.769vw, 2rem);
+  --text-h3--line-height: 1.344;
+
+  /* Brand colors */
+  --color-warm-surface: #e2d9c8;
+  --color-warm-text: #544a3e;
+  --color-dark-roast: #2a0000;
 }
 
 :root {
@@ -138,5 +147,18 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .font-alt {
+    font-family: var(--font-poppins);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

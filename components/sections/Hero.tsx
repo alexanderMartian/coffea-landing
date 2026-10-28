@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative overflow-x-clip min-h-[70svh] 3xl:h-[62.5rem] flex flex-col"
+      className="relative overflow-x-clip min-h-[70svh] 3xl:min-h-[62.5rem] flex flex-col"
     >
       {/* Full-bleed background image */}
       <Image
@@ -56,7 +56,7 @@ export default function Hero() {
           <a
             href={site.hero.ctaHref}
             data-spec="hero-cta"
-            className="inline-flex items-center justify-center bg-white text-foreground font-sans font-medium text-base lg:text-lg rounded-[6.25rem] px-10 h-[3.4375rem] w-fit min-h-11"
+            className="inline-flex items-center justify-center bg-white text-foreground font-sans font-medium text-base lg:text-lg rounded-[6.25rem] px-10 min-h-[3.4375rem] w-fit"
           >
             {site.hero.cta}
           </a>

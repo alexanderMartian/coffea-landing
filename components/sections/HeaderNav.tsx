@@ -11,7 +11,7 @@ import { site } from "@/content/site";
 
 export default function HeaderNav() {
   return (
-    <div className="mx-auto w-full max-w-content px-4 md:px-8 3xl:px-0 flex items-center justify-between h-11 3xl:h-[3.8125rem]">
+    <div className="mx-auto w-full max-w-content px-4 md:px-8 3xl:px-0 flex items-center justify-between min-h-11 3xl:min-h-[3.8125rem]">
       {/* Logo */}
       <Link
         data-spec="header-logo"

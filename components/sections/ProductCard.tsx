@@ -1,0 +1,88 @@
+import Image from "next/image";
+import { Heart } from "lucide-react";
+
+export interface ProductCardProps {
+  image: string;
+  imageAlt: string;
+  title: string;
+  description: string;
+  price: string;
+  cta: string;
+  /** Pass the section id for the first card; omit (empty string) for the rest. */
+  specPrefix?: string;
+}
+
+export default function ProductCard({
+  image,
+  imageAlt,
+  title,
+  description,
+  price,
+  cta,
+  specPrefix,
+}: ProductCardProps) {
+  const s = specPrefix || undefined;
+
+  return (
+    <article
+      data-spec={s && `${s}-card`}
+      className="snap-start shrink-0 flex flex-col
+        w-[85%] md:w-[calc(50%-0.25rem)] lg:w-[calc(33.333%-4px)] 3xl:w-[22.875rem]
+        bg-warm-surface/20 border border-warm-surface rounded-[1.125rem] p-4 gap-4"
+    >
+      <div
+        data-spec={s && `${s}-card-image`}
+        className="relative overflow-hidden rounded-[0.75rem]"
+      >
+        <div className="aspect-[334/364]">
+          <Image
+            src={image}
+            alt={imageAlt}
+            fill
+            className="object-cover"
+            sizes="(min-width: 1920px) 366px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 85vw"
+          />
+        </div>
+        <Heart
+          size={28}
+          className="absolute top-8 right-3 stroke-[#f1f0ee] fill-none"
+          aria-hidden
+        />
+      </div>
+
+      {/* Figma desc box is fixed 47px — 2 lines × 28 = 56; 12 − 9 = 3 keeps the design's visual gap */}
+      <div className="flex flex-col gap-[3px]">
+        <div className="flex flex-col gap-2.5">
+          <h3
+            data-spec={s && `${s}-card-title`}
+            className="font-sans font-semibold text-xl lg:text-2xl 3xl:text-[2.375rem] text-foreground"
+          >
+            {title}
+          </h3>
+          <p
+            data-spec={s && `${s}-card-desc`}
+            className="font-sans font-normal text-base lg:text-xl leading-[1.4] text-dark-roast"
+          >
+            {description}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span
+            data-spec={s && `${s}-card-price`}
+            className="font-alt font-semibold text-base lg:text-xl leading-[1.5] text-dark-roast"
+          >
+            {price}
+          </span>
+          <button
+            data-spec={s && `${s}-card-btn`}
+            type="button"
+            className="font-alt font-medium text-sm bg-dark-roast text-white rounded-[0.5rem] py-3 px-[1.625rem] 3xl:py-[0.625rem]"
+          >
+            {cta}
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}

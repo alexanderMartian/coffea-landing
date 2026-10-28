@@ -15,9 +15,59 @@ export const site = {
   hero: {
     eyebrow: "Welcome",
     title: "We serve the richest coffee in the city!",
-    body: "[PLACEHOLDER: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor]",
+    // PLACEHOLDER: lorem from the design
+    body: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor",
     cta: "Order Now",
     ctaHref: "#order",
     imageAlt: "",
+  },
+  categories: {
+    items: [
+      { label: "Hot Coffee", icon: "/images/categories/icon-hot-coffee.svg" },
+      { label: "Cold Coffee", icon: "/images/categories/icon-cold-coffee.svg" },
+      { label: "Cup Coffee", icon: "/images/categories/icon-cup-coffee.svg" },
+      { label: "Dessert", icon: "/images/categories/icon-dessert.svg" },
+    ],
+  },
+  coffeeMenu: {
+    title: "our special coffee",
+    items: [
+      {
+        image: "/images/coffee-menu/card-1.jpg",
+        imageAlt: "Cup of lungo coffee",
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+      {
+        image: "/images/coffee-menu/card-2.jpg",
+        imageAlt: "Lungo coffee in a glass",
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+      {
+        image: "/images/coffee-menu/card-3.jpg",
+        imageAlt: "Lungo coffee with milk",
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+      {
+        image: "/images/coffee-menu/card-4.jpg",
+        imageAlt: "Hot lungo coffee in a mug",
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+    ],
   },
 } as const;

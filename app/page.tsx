@@ -1,9 +1,18 @@
 import Hero from "@/components/sections/Hero";
+import Categories from "@/components/sections/Categories";
+import ProductSection from "@/components/sections/ProductSection";
+import { site } from "@/content/site";
 
 export default function Home() {
   return (
     <main>
       <Hero />
+      <Categories />
+      <ProductSection
+        id="coffee-menu"
+        title={site.coffeeMenu.title}
+        items={site.coffeeMenu.items}
+      />
     </main>
   );
 }
