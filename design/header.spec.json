@@ -1,0 +1,11 @@
+{
+  "section": "header",
+  "nodeId": "2013:2",
+  "frame": { "width": 1444, "height": 61, "x": 238, "y": 0, "pageWidth": 1920 },
+  "elements": {
+    "header": {},
+    "header-logo": { "fontSize": 32, "fontWeight": 700, "fontFamily": "Playfair Display", "color": "#ffffff" },
+    "header-nav-link": { "fontSize": 18, "fontWeight": 500, "fontFamily": "Outfit", "color": "#ffffff" },
+    "header-search": { "w": 61, "h": 61, "bg": "#ffffff", "radius": 100 }
+  }
+}

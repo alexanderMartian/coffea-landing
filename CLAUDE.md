@@ -17,7 +17,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 
 | # | Section | id | Figma node | Status | Notes |
 |---|---|---|---|---|---|
-| 0 | Header | `header` | `2013:2` | ⬜ | Nav bar, floats over Hero; in app/layout.tsx |
+| 0 | Header | `header` | `2013:2` | ✅ | Nav bar, floats over Hero; in app/layout.tsx; pixel diff n/a (transparent bg) |
 | 1 | Hero | `hero` | `2013:3` | ✅ | font diff ~3.6% (Playfair rendering) |
 | 2 | Categories | `categories` | `2013:4` | ⬜ | |
 | 3 | Coffee Menu | `coffee-menu` | `2013:5` | ⬜ | Shared card component with Dessert Menu |
