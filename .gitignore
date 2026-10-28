@@ -44,3 +44,5 @@ next-env.d.ts
 # qa screenshots and Figma reference images (landing kit)
 .qa/
 design/*.png
+
+.claude/settings.local.json

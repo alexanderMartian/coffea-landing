@@ -59,8 +59,9 @@ Edit tools are denied in `.claude/settings.json` — never try to change the Fig
   }
 }
 ```
+   - `frame`: `width`/`height` of the Figma section frame. If the frame is narrower than the page (e.g. 1760 inside 1920) or starts below the top of our `<section>` (header overlay), add `"x"` = its `bounds.x` in the design frame, `"y"` = its offset from the top of our `<section>` (usually 0) and `"pageWidth"` = design frame width (1920). The checker then compares only that area. In that case don't put `w`/`h` on the section key.
    - Keys = `data-spec` values in the code; the section's own key = its `id` (no `data-spec` on `<section>`).
-   - Props: `x y w h` (px, relative to the section's top-left), `fontSize lineHeight fontWeight letterSpacing fontFamily color bg radius paddingTop paddingRight paddingBottom paddingLeft gap rowGap columnGap`. Unit conversions are in `references/figma-mapping.md`.
+   - Props: `x y w h` (px, relative to the Figma frame's top-left), `fontSize lineHeight fontWeight letterSpacing fontFamily color bg radius paddingTop paddingRight paddingBottom paddingLeft gap rowGap columnGap`. Unit conversions are in `references/figma-mapping.md`.
    - `x`/`y` only for anchors not placed by auto layout (sum the parents' `bounds` up to the section). Omit `w` for hug text (`textAutoResize: WIDTH_AND_HEIGHT`) and for fill children. Never invent values — only what `get_node` returned.
 4. Copy texts verbatim into `content/site.ts`. Lorem ipsum or obvious drafts → `[PLACEHOLDER: ...]`.
 

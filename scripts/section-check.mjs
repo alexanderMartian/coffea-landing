@@ -44,7 +44,12 @@ if (existsSync(specPath)) {
   }
 }
 const designWidth = Number(spec?.frame?.width) || 1920;
+// Where the Figma frame sits inside our full-width <section> (frames narrower than the page, overlays).
+const frameX = Number(spec?.frame?.x) || 0;
+const frameY = Number(spec?.frame?.y) || 0;
+const pageWidth = Number(spec?.frame?.pageWidth) || (frameX ? 1920 : designWidth); // viewport for the design check
 const widths = (flag("widths") ? flag("widths").split(",").map(Number) : DEFAULT_WIDTHS)
+  .map((w) => (w === 1920 && pageWidth !== 1920 ? pageWidth : w))
   .filter((w) => Number.isFinite(w) && w > 0)
   .sort((a, b) => a - b);
 
@@ -187,7 +192,7 @@ function compareSpec(specEls, measured) {
     for (const [prop, exp] of Object.entries(want)) {
       if (exp === null || exp === undefined || prop.startsWith("_")) continue;
       checks++;
-      const act = got[prop];
+      const act = prop === "x" ? got.x - frameX : prop === "y" ? got.y - frameY : got[prop];
       let ok;
       if (prop === "color" || prop === "bg") ok = hexDist(String(exp).toLowerCase(), act) <= 3;
       else if (prop === "fontFamily") ok = String(act).toLowerCase().includes(String(exp).toLowerCase());
@@ -204,15 +209,18 @@ function compareSpec(specEls, measured) {
 async function pixelDiff(oursB64, designB64) {
   const page = await browser.newPage();
   const res = await page.evaluate(
-    async ({ oursB64, designB64 }) => {
+    async ({ oursB64, designB64, fw, fx, fy }) => {
       const load = (b64) => new Promise((ok, err) => { const i = new Image(); i.onload = () => ok(i); i.onerror = err; i.src = "data:image/png;base64," + b64; });
       const [ours, design] = await Promise.all([load(oursB64), load(designB64)]);
-      const W = ours.naturalWidth;
+      // Compare only the part of our section where the Figma frame sits (fx, fy, fw wide).
+      const W = Math.min(fw, ours.naturalWidth - fx);
       const dScale = W / design.naturalWidth;
       const dH = Math.round(design.naturalHeight * dScale);
-      const H = Math.max(ours.naturalHeight, dH);
+      // Offset frame (narrower than the section): compare only the frame's height; section padding around it is ours.
+      const oursH = fx || fy ? Math.min(ours.naturalHeight - fy, dH) : ours.naturalHeight - fy;
+      const H = Math.max(oursH, dH);
       const mk = () => { const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d", { willReadFrequently: true }); x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); return [c, x]; };
-      const [, a] = mk(); a.drawImage(ours, 0, 0);
+      const [, a] = mk(); a.drawImage(ours, fx, fy, W, oursH, 0, 0, W, oursH);
       const [, b] = mk(); b.drawImage(design, 0, 0, W, dH);
       const A = a.getImageData(0, 0, W, H).data, B = b.getImageData(0, 0, W, H).data;
       const [outC, o] = mk();
@@ -232,9 +240,9 @@ async function pixelDiff(oursB64, designB64) {
         .filter((x) => x.pct >= 5)
         .sort((x, y) => y.pct - x.pct)
         .slice(0, 3);
-      return { pct: (diff / (W * H)) * 100, oursH: ours.naturalHeight, designH: dH, top, png: outC.toDataURL("image/png").split(",")[1] };
+      return { pct: (diff / (W * H)) * 100, oursH, designH: dH, top, png: outC.toDataURL("image/png").split(",")[1] };
     },
-    { oursB64, designB64 }
+    { oursB64, designB64, fw: designWidth, fx: frameX, fy: frameY }
   );
   await page.close();
   return res;
@@ -311,7 +319,7 @@ async function rules(page, width) {
 let total = 0;
 const atDesign = {}; // widths of spec elements at design width, for the "stretch" rule
 const ruleHits = {}; // rule issue text -> widths where it occurred
-console.log(`SECTION ${id} — ${url} — design width ${designWidth}${spec ? "" : " (no spec)"}`);
+console.log(`SECTION ${id} — ${url} — design ${designWidth}px${frameX || frameY ? ` at x${frameX} y${frameY}` : ""} in ${pageWidth}px${spec ? "" : " (no spec)"}`);
 
 for (const width of widths) {
   const { context, page, section } = await preparePage(width);
@@ -325,7 +333,7 @@ for (const width of widths) {
   const buf = await section.screenshot({ path: shot });
   const lines = [];
 
-  if (width === designWidth) {
+  if (width === pageWidth) {
     if (spec?.elements) {
       const keys = Object.keys(spec.elements);
       const m = await measure(page, keys);
@@ -342,9 +350,9 @@ for (const width of widths) {
       writeFileSync(diffPath, Buffer.from(d.png, "base64"));
       const bands = d.top.map((b) => `${b.from}–${b.to}px ${b.pct.toFixed(0)}%`).join(", ");
       lines.push(`pixel diff ${d.pct.toFixed(1)}%${bands ? ` (worst rows: ${bands})` : ""} → ${diffPath}`);
-      if (Math.abs(d.oursH - d.designH) > 4) { lines.push(`   - height: ours ${d.oursH} ≠ design ${d.designH}`); total++; }
+      if (!frameX && !frameY && Math.abs(d.oursH - d.designH) > 4) { lines.push(`   - height: ours ${d.oursH} ≠ design ${d.designH}`); total++; }
     }
-  } else if (width > designWidth && Object.keys(atDesign).length) {
+  } else if (width > pageWidth && Object.keys(atDesign).length) {
     const m = await measure(page, Object.keys(atDesign));
     const stretched = Object.entries(atDesign)
       .filter(([k, w]) => k !== id && m[k] && m[k].w > w * 1.05)
