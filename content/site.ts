@@ -75,7 +75,7 @@ export const site = {
     items: [
       {
         image: "/images/dessert-menu/card-1.jpg",
-        imageAlt: "[PLACEHOLDER: alt text for dessert card 1]",
+        imageAlt: "Two cups of latte art on a wooden table surrounded by green plants, viewed from above",
         // PLACEHOLDER: lorem from the design
         title: "Lungo coffee",
         // PLACEHOLDER: lorem from the design
@@ -85,7 +85,7 @@ export const site = {
       },
       {
         image: "/images/dessert-menu/card-2.jpg",
-        imageAlt: "[PLACEHOLDER: alt text for dessert card 2]",
+        imageAlt: "Single cup of latte art on a rustic wooden stool, viewed from above",
         // PLACEHOLDER: lorem from the design
         title: "Lungo coffee",
         // PLACEHOLDER: lorem from the design
@@ -95,7 +95,7 @@ export const site = {
       },
       {
         image: "/images/dessert-menu/card-3.jpg",
-        imageAlt: "[PLACEHOLDER: alt text for dessert card 3]",
+        imageAlt: "Cup of latte with spiral milk art on a dark blue background, viewed from above",
         // PLACEHOLDER: lorem from the design
         title: "Lungo coffee",
         // PLACEHOLDER: lorem from the design
@@ -105,7 +105,7 @@ export const site = {
       },
       {
         image: "/images/dessert-menu/card-4.jpg",
-        imageAlt: "[PLACEHOLDER: alt text for dessert card 4]",
+        imageAlt: "White cup of latte art on a saucer, on a wooden surface in warm sunlight",
         // PLACEHOLDER: lorem from the design
         title: "Lungo coffee",
         // PLACEHOLDER: lorem from the design
