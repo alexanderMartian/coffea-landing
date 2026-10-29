@@ -13,6 +13,11 @@ export default function Home() {
         title={site.coffeeMenu.title}
         items={site.coffeeMenu.items}
       />
+      <ProductSection
+        id="dessert-menu"
+        title={site.dessertMenu.title}
+        items={site.dessertMenu.items}
+      />
     </main>
   );
 }

@@ -21,7 +21,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 | 1 | Hero | `hero` | `2013:3` | ✅ | font diff ~3.6% (Playfair rendering) |
 | 2 | Categories | `categories` | `2013:4` | ✅ | Outfit → Poppins (sans font); pixel diff 1.8% |
 | 3 | Coffee Menu | `coffee-menu` | `2013:5` | ✅ | ProductCard + ProductSection + CarouselRow; spec 29/29; pixel diff 3.7%; text-cut-off at <1920 = carousel scroll behavior (expected) |
-| 4 | Dessert Menu | `dessert-menu` | `2013:6` | ⬜ | Shared card component with Coffee Menu |
+| 4 | Dessert Menu | `dessert-menu` | `2013:6` | ✅ | Shared card component with Coffee Menu; pixel diff 4.0%; text-cut-off at <1920 = carousel scroll behavior (expected) |
 | 5 | Promo | `promo` | `2013:7` | ⬜ | |
 | 6 | Testimonials | `testimonials` | `2013:8` | ⬜ | |
 | 7 | Newsletter | `newsletter` | `0:239` | ⬜ | |

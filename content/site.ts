@@ -70,4 +70,49 @@ export const site = {
       },
     ],
   },
+  dessertMenu: {
+    title: "our special dessert",
+    items: [
+      {
+        image: "/images/dessert-menu/card-1.jpg",
+        imageAlt: "[PLACEHOLDER: alt text for dessert card 1]",
+        // PLACEHOLDER: lorem from the design
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+      {
+        image: "/images/dessert-menu/card-2.jpg",
+        imageAlt: "[PLACEHOLDER: alt text for dessert card 2]",
+        // PLACEHOLDER: lorem from the design
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+      {
+        image: "/images/dessert-menu/card-3.jpg",
+        imageAlt: "[PLACEHOLDER: alt text for dessert card 3]",
+        // PLACEHOLDER: lorem from the design
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+      {
+        image: "/images/dessert-menu/card-4.jpg",
+        imageAlt: "[PLACEHOLDER: alt text for dessert card 4]",
+        // PLACEHOLDER: lorem from the design
+        title: "Lungo coffee",
+        // PLACEHOLDER: lorem from the design
+        description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit,",
+        price: "Rs. 200",
+        cta: "Order Now",
+      },
+    ],
+  },
 } as const;

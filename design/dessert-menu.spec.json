@@ -1,0 +1,15 @@
+{
+  "section": "dessert-menu",
+  "nodeId": "2013:6",
+  "frame": { "x": 80, "pageWidth": 1920, "width": 1760, "height": 677 },
+  "elements": {
+    "dessert-menu":          { "h": 677 },
+    "dessert-menu-heading":  { "fontSize": 32, "fontWeight": 600, "fontFamily": "Playfair Display", "letterSpacing": 1.28, "color": "#30261c" },
+    "dessert-menu-card":     { "w": 366, "h": 570, "radius": 18 },
+    "dessert-menu-card-image": { "w": 334, "h": 364, "radius": 12 },
+    "dessert-menu-card-title": { "fontSize": 38, "fontWeight": 600, "fontFamily": "Outfit", "color": "#30261c" },
+    "dessert-menu-card-desc":  { "fontSize": 20, "fontWeight": 400, "fontFamily": "Outfit", "lineHeight": 28, "color": "#2a0000" },
+    "dessert-menu-card-price": { "fontSize": 20, "fontWeight": 600, "fontFamily": "Poppins", "color": "#2a0000" },
+    "dessert-menu-card-btn":   { "h": 41, "radius": 8, "bg": "#2a0000", "color": "#ffffff", "fontSize": 14 }
+  }
+}
