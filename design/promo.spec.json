@@ -1,0 +1,12 @@
+{
+  "section": "promo",
+  "nodeId": "2013:7",
+  "frame": { "width": 1920, "height": 335 },
+  "elements": {
+    "promo":          { "h": 335, "bg": "#e2d9c8" },
+    "promo-heading":  { "x": 608, "y": 80, "w": 372, "fontSize": 40, "lineHeight": 50, "fontWeight": 600, "fontFamily": "Playfair Display", "color": "#000000" },
+    "promo-cta":      { "x": 608, "y": 204, "w": 258, "h": 51, "radius": 100, "bg": "#30261c", "color": "#f1f0ee", "fontSize": 16 },
+    "promo-img-left": { "x": 0, "y": 0, "w": 520, "h": 335 },
+    "promo-img-right":{ "x": 1417, "y": 0, "w": 503, "h": 335 }
+  }
+}

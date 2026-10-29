@@ -22,7 +22,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 | 2 | Categories | `categories` | `2013:4` | ✅ | Outfit → Poppins (sans font); pixel diff 1.8% |
 | 3 | Coffee Menu | `coffee-menu` | `2013:5` | ✅ | ProductCard + ProductSection + CarouselRow; spec 29/29; pixel diff 3.7%; text-cut-off at <1920 = carousel scroll behavior (expected) |
 | 4 | Dessert Menu | `dessert-menu` | `2013:6` | ✅ | Shared card component with Coffee Menu; pixel diff 4.0%; text-cut-off at <1920 = carousel scroll behavior (expected) |
-| 5 | Promo | `promo` | `2013:7` | ⬜ | |
+| 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 5.2% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |
 | 6 | Testimonials | `testimonials` | `2013:8` | ⬜ | |
 | 7 | Newsletter | `newsletter` | `0:239` | ⬜ | |
 | 8 | Footer | `footer` | `2013:9` | ⬜ | |

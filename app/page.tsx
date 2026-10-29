@@ -1,6 +1,7 @@
 import Hero from "@/components/sections/Hero";
 import Categories from "@/components/sections/Categories";
 import ProductSection from "@/components/sections/ProductSection";
+import Promo from "@/components/sections/Promo";
 import { site } from "@/content/site";
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
         title={site.dessertMenu.title}
         items={site.dessertMenu.items}
       />
+      <Promo />
     </main>
   );
 }

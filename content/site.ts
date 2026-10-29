@@ -115,4 +115,10 @@ export const site = {
       },
     ],
   },
+  promo: {
+    heading: "Check Out Our Best Coffee Beans",
+    // PLACEHOLDER: "Explore Out Products" in Figma (likely typo for "Our")
+    cta: "Explore Our Products",
+    ctaHref: "#coffee-menu",
+  },
 } as const;
