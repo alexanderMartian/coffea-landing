@@ -1,0 +1,38 @@
+{
+  "section": "testimonials",
+  "nodeId": "2013:8",
+  "frame": { "width": 1444, "height": 404, "x": 238, "y": 0, "pageWidth": 1920 },
+  "elements": {
+    "testimonials-heading-label": {
+      "fontSize": 32, "fontFamily": "Reggae One", "fontWeight": 400,
+      "color": "#30261c"
+    },
+    "testimonials-heading-title": {
+      "fontSize": 32, "fontFamily": "Playfair Display", "fontWeight": 600,
+      "letterSpacing": 1.28,
+      "color": "#30261c"
+    },
+    "testimonials-card-active": {
+      "x": 502, "y": 133, "w": 441,
+      "radius": 18,
+      "paddingTop": 28, "paddingRight": 28, "paddingBottom": 28, "paddingLeft": 28
+    },
+    "testimonials-card-avatar": {
+      "w": 56, "h": 56
+    },
+    "testimonials-card-name": {
+      "fontSize": 18, "fontFamily": "Poppins", "fontWeight": 600,
+      "color": "#30261c"
+    },
+    "testimonials-card-role": {
+      "fontSize": 14, "fontFamily": "Poppins", "fontWeight": 600
+    },
+    "testimonials-card-body": {
+      "fontSize": 12, "fontWeight": 500, "lineHeight": 20,
+      "color": "#30261c"
+    },
+    "testimonials-dots": {
+      "x": 696, "y": 392, "w": 52, "h": 12
+    }
+  }
+}
