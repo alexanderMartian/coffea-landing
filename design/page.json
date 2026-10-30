@@ -1,0 +1,14 @@
+{
+  "pageWidth": 1920,
+  "sections": [
+    { "id": "header",       "nodeId": "2013:2", "y": 55,   "height": 61,  "overlay": true,  "note": "floats over Hero, no gapBefore" },
+    { "id": "hero",         "nodeId": "2013:3", "y": 0,    "height": 1000, "gapBefore": 0 },
+    { "id": "categories",   "nodeId": "2013:4", "y": 1000, "height": 220,  "gapBefore": 0 },
+    { "id": "coffee-menu",  "nodeId": "2013:5", "y": 1300, "height": 677,  "gapBefore": 80 },
+    { "id": "dessert-menu", "nodeId": "2013:6", "y": 2057, "height": 677,  "gapBefore": 80 },
+    { "id": "promo",        "nodeId": "2013:7", "y": 2798, "height": 335,  "gapBefore": 64 },
+    { "id": "testimonials", "nodeId": "2013:8", "y": 3197, "height": 404,  "gapBefore": 64 },
+    { "id": "newsletter",   "nodeId": "0:239",  "y": 3665, "height": 320,  "gapBefore": 64 },
+    { "id": "footer",       "nodeId": "2013:9", "y": 3985, "height": 358,  "gapBefore": 0 }
+  ]
+}

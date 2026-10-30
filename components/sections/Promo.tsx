@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { site } from "@/content/site";
 
-export default function Promo() {
+export default function Promo({ className }: { className?: string }) {
   return (
     <section
       id="promo"
       data-spec="promo"
-      className="relative overflow-hidden bg-warm-surface"
+      className={cn("relative overflow-hidden bg-warm-surface", className)}
     >
       {/* Left decorative image — hidden on mobile */}
       <div
@@ -24,7 +25,7 @@ export default function Promo() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex items-center min-h-[240px] md:h-[335px]">
+      <div className="relative z-10 flex items-center min-h-[240px] md:min-h-[335px]">
         <div className="w-full px-6 py-10 md:py-0 text-center md:text-left md:pl-[31.67%] 3xl:pl-[608px] md:pr-6">
           <h2
             data-spec="promo-heading"

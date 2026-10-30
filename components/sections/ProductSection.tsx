@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import CarouselRow from "./CarouselRow";
 import ProductCard from "./ProductCard";
 
@@ -14,11 +15,13 @@ interface Props {
   id: string;
   title: string;
   items: readonly ProductItem[];
+  /** margin-top token class, e.g. "mt-section-lg". Passed from page.tsx, not hard-coded. */
+  className?: string;
 }
 
-export default function ProductSection({ id, title, items }: Props) {
+export default function ProductSection({ id, title, items, className }: Props) {
   return (
-    <section id={id} className="overflow-x-clip mt-20">
+    <section id={id} className={cn("overflow-x-clip", className)}>
       <div className="mx-auto w-full max-w-[110rem] px-4 md:px-8 3xl:px-0">
         <h2
           data-spec={`${id}-heading`}

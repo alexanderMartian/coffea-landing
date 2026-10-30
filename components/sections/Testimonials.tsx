@@ -101,11 +101,11 @@ function TestimonialCard({
   );
 }
 
-export default function Testimonials() {
+export default function Testimonials({ className }: { className?: string }) {
   const { testimonials } = site;
 
   return (
-    <section id="testimonials" className="overflow-x-clip">
+    <section id="testimonials" className={cn("overflow-x-clip", className)}>
       <div className="mx-auto w-full max-w-content px-4 md:px-8 lg:px-12 3xl:px-0">
 
         {/* Heading: "Come and Join" + "our happy customers" */}
