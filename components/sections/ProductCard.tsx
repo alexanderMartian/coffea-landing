@@ -50,8 +50,9 @@ export default function ProductCard({
         />
       </div>
 
-      {/* Figma desc box is fixed 47px — 2 lines × 28 = 56; 12 − 9 = 3 keeps the design's visual gap */}
-      <div className="flex flex-col gap-[3px]">
+      {/* Figma desc frame is fixed 47px (Fill × 47) with Vertical Trim; trimmed text ~43px,
+          so the 4px empty frame is added to the gap (12 + 4 = 16) */}
+      <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2.5">
           <h3
             data-spec={s && `${s}-card-title`}
@@ -61,7 +62,7 @@ export default function ProductCard({
           </h3>
           <p
             data-spec={s && `${s}-card-desc`}
-            className="font-sans font-normal text-base lg:text-xl leading-[1.4] text-dark-roast"
+            className="font-sans font-normal text-base lg:text-xl leading-[1.4] text-dark-roast [text-box:trim-both_cap_alphabetic]"
           >
             {description}
           </p>
