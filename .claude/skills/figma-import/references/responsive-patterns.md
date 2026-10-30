@@ -9,6 +9,8 @@ Pick one pattern per block. "Signal" = what you see in `get_node` / the referenc
 4. **No new dependencies** for sliders: use CSS scroll-snap (pattern 11) or a grid.
 5. **The desktop structure starts at `lg:` (1024)** unless the block is too dense — then `xl:`.
 6. Decor must never cause horizontal scroll: anchor it to the container and put `overflow-x-clip` on the section.
+7. **Readability overlay on mobile is allowed:** text over a photo may get a gradient/scrim below `lg:` (`lg:hidden`) even if Figma has none — the crop changes on narrow screens. At 1920 the section stays identical to the design.
+8. **Spacing between sections** comes from `design/page.json` (`mt-section-*`, breakpoints.md), not from each section's own guess.
 
 ## 1. Header / navigation
 Signal: logo + row of links + button at the top. → 360–1023: logo + burger (shadcn `Sheet`, links stacked, CTA inside the sheet and optionally a small CTA next to the burger) · `lg:` links in a row. Sticky only if the design implies it. Burger button ≥ 44 px, `aria-label`.

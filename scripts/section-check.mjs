@@ -1,16 +1,22 @@
 #!/usr/bin/env node
-// Checks ONE landing section against its Figma reference and responsive rules (used by the figma-import skill).
+// Checks ONE landing section against its Figma reference and responsive rules (used by the figma-import skill),
+// or, with --page, the position of every section on the page.
 //
 // Usage:
 //   node scripts/section-check.mjs <section-id> [--widths 360,768,1920] [--base http://localhost:3000] [--path /]
+//   node scripts/section-check.mjs --page [--widths 360,1920] [--base …] [--path /]
 //
 // Inputs (optional, created by the figma-import skill):
 //   design/<section-id>.png        Figma export of the section frame (scale 1)
 //   design/<section-id>.spec.json  key values from Figma: { frame: { width, height }, elements: { "<data-spec key>": {...} } }
+//   design/page.json               page map (--page): { pageWidth, sections: [{ id, nodeId, y, height, gapBefore, overlay? }] }
 //
-// At the design width (spec.frame.width, default 1920) it measures every [data-spec] element against the spec
-// and makes a pixel diff with design/<id>.png. At every width it runs layout rules (overflow, small text,
-// tap targets, overlaps, clipped text, upscaled images, invisible blocks).
+// Section mode: at the design width (spec.frame.width, default 1920) it measures every [data-spec] element against
+// the spec and makes a pixel diff with design/<id>.png. At every width it runs layout rules (overflow, small text,
+// tap targets, overlaps, clipped text, upscaled images, invisible blocks). A text height mismatch that matches the
+// Figma "Vertical trim" signature gets a hint.
+// Page mode: at the design width every built section must start at its Figma y (±2 px); at smaller widths sections
+// that have a gap in Figma must not touch, and no section may overlap the next one.
 // Output: a short text report + screenshots in .qa/sections/. Exit code 1 when anything is off.
 import { mkdirSync, readFileSync, existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -24,13 +30,31 @@ const flag = (name) => {
   const i = argv.indexOf(`--${name}`);
   return i === -1 ? undefined : argv[i + 1];
 };
-const id = argv.find((a, i) => !a.startsWith("--") && !argv[i - 1]?.startsWith("--"));
-if (!id) {
+const VALUE_FLAGS = ["widths", "base", "path"];
+const pageMode = argv.includes("--page");
+const id = argv.find((a, i) => !a.startsWith("--") && !VALUE_FLAGS.includes(argv[i - 1]?.slice(2)));
+if (!id && !pageMode) {
   console.log("Usage: node scripts/section-check.mjs <section-id> [--widths 360,1920] [--base http://localhost:3000] [--path /]");
+  console.log("       node scripts/section-check.mjs --page [--widths 360,1920]");
   process.exit(2);
 }
 const base = flag("base") ?? "http://localhost:3000";
 const url = new URL(flag("path") ?? "/", base).toString();
+
+let pageMap = null;
+if (pageMode) {
+  const pagePath = join("design", "page.json");
+  if (!existsSync(pagePath)) {
+    console.log(`NO PAGE MAP: ${pagePath} is missing — figma-import step 1 writes it from the section frame bounds`);
+    process.exit(2);
+  }
+  try {
+    pageMap = JSON.parse(readFileSync(pagePath, "utf8"));
+  } catch (e) {
+    console.log(`PAGE MAP INVALID: ${pagePath} — ${e.message}`);
+    process.exit(2);
+  }
+}
 
 const specPath = join("design", `${id}.spec.json`);
 const designPngPath = join("design", `${id}.png`);
@@ -47,7 +71,9 @@ const designWidth = Number(spec?.frame?.width) || 1920;
 // Where the Figma frame sits inside our full-width <section> (frames narrower than the page, overlays).
 const frameX = Number(spec?.frame?.x) || 0;
 const frameY = Number(spec?.frame?.y) || 0;
-const pageWidth = Number(spec?.frame?.pageWidth) || (frameX ? 1920 : designWidth); // viewport for the design check
+const pageWidth = pageMode
+  ? Number(pageMap.pageWidth) || 1920
+  : Number(spec?.frame?.pageWidth) || (frameX ? 1920 : designWidth); // viewport for the design check
 const widths = (flag("widths") ? flag("widths").split(",").map(Number) : DEFAULT_WIDTHS)
   .map((w) => (w === 1920 && pageWidth !== 1920 ? pageWidth : w))
   .filter((w) => Number.isFinite(w) && w > 0)
@@ -122,6 +148,23 @@ async function preparePage(width) {
   await page.addStyleTag({ content: FREEZE_CSS });
   await page.evaluate(PAGE_HELPERS);
   await page.evaluate(() => document.fonts.ready);
+  if (pageMode) {
+    // Scroll the whole page so lazy images load and layout settles, then back to top.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += 700) {
+        window.scrollTo(0, y);
+        await new Promise((r) => setTimeout(r, 60));
+      }
+      const imgs = [...document.images];
+      await Promise.race([
+        Promise.all(imgs.map((i) => (i.complete ? null : new Promise((r) => { i.onload = i.onerror = r; })))),
+        new Promise((r) => setTimeout(r, 5000)),
+      ]);
+      window.scrollTo(0, 0);
+    });
+    await page.waitForTimeout(250);
+    return { context, page, section: null };
+  }
   const exists = await page.evaluate((sid) => !!document.getElementById(sid), id);
   if (!exists) return { context, page, section: null };
   // Scroll through the section so lazy images load, then back to top.
@@ -166,6 +209,8 @@ async function measure(page, keys) {
           radius: px(s.borderTopLeftRadius),
           paddingTop: px(s.paddingTop), paddingRight: px(s.paddingRight), paddingBottom: px(s.paddingBottom), paddingLeft: px(s.paddingLeft),
           gap: px(row ? s.columnGap : s.rowGap), rowGap: px(s.rowGap), columnGap: px(s.columnGap),
+          isText: [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()),
+          trimmed: /trim/.test(s.textBoxTrim || s.getPropertyValue("text-box-trim") || "") && !/none/.test(s.textBoxTrim || ""),
         };
       }
       return out;
@@ -199,10 +244,26 @@ function compareSpec(specEls, measured) {
       else if (prop === "fontWeight") ok = Number(exp) === act;
       else if (prop in TOL) ok = typeof act === "number" && Math.abs(act - Number(exp)) <= TOL[prop];
       else { checks--; continue; } // unknown prop: ignore
-      if (!ok) fails.push(`${key} ${prop}: ours ${act} ≠ design ${exp}`);
+      if (!ok) fails.push(`${key} ${prop}: ours ${act} ≠ design ${exp}${prop === "h" ? trimHint(got, Number(exp)) : ""}`);
     }
   }
   return { checks, fails };
+}
+
+// Figma "Vertical trim: Cap height to baseline" makes a text box shorter than lines × lineHeight:
+// trimmed height = (lines − 1) × lineHeight + cap height (≈ 0.62–0.78 × fontSize, font-dependent).
+// Bridge doesn't export it, so recognise it by the numbers.
+function trimHint(got, want) {
+  const lh = Number(got.lineHeight), fs = Number(got.fontSize);
+  if (!got.isText || !(lh > 0) || !(fs > 0) || got.trimmed || want >= got.h) return "";
+  const lines = Math.max(1, Math.round(got.h / lh));
+  const lo = (lines - 1) * lh + 0.62 * fs - 2;
+  const hi = (lines - 1) * lh + 0.78 * fs + 2;
+  if (want >= lo && want <= hi)
+    return ` → looks like Figma Vertical trim (cap height to baseline): add [text-box:trim-both_cap_alphabetic]; ask the user to confirm in Figma (Typography → Type settings → Vertical trim)`;
+  if (want > hi && want < lines * lh)
+    return ` → text box shorter than ${lines} × ${lh} but taller than trimmed text: maybe Vertical trim + fixed-height box, or wrapping differs — ask the user to check Vertical trim and resizing (Hug / Fixed) in Figma`;
+  return "";
 }
 
 // ---------- pixel diff (in a blank page, no extra deps) ----------
@@ -264,11 +325,16 @@ async function rules(page, width) {
         if (top.length) issues.push(`overflow-x: ${top.map((el) => `${window.__label(el)} (right ${Math.round(el.getBoundingClientRect().right)})`).join(" | ")}`);
       }
       const texts = window.__textLeaves(section);
-      // 2. text cut by an overflow-hidden/clip ancestor or by ellipsis
+      // 2. text cut by an overflow-hidden/clip ancestor or by ellipsis.
+      //    Text inside a horizontal scroller (carousel) that is just scrolled out of view is not "cut".
       const clipped = texts.filter((el) => {
         const r = el.getBoundingClientRect();
         for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
           const s = getComputedStyle(p);
+          if (/(auto|scroll)/.test(s.overflowX) && p.scrollWidth > p.clientWidth + 1) {
+            const pr = p.getBoundingClientRect();
+            if (r.right > pr.right + 1 || r.left < pr.left - 1) return false;
+          }
           if (/(hidden|clip)/.test(s.overflowX + s.overflowY)) {
             const pr = p.getBoundingClientRect();
             if (r.right > pr.right + 1 || r.left < pr.left - 1 || r.bottom > pr.bottom + 1) return true;
@@ -314,6 +380,85 @@ async function rules(page, width) {
     { sid: id, width }
   );
 }
+
+// ---------- page mode ----------
+// Positions of all sections from design/page.json. y in the map is relative to the top of the design frame.
+async function pagePositions(page, ids) {
+  return page.evaluate((ids) => {
+    const out = {};
+    for (const sid of ids) {
+      const el = document.getElementById(sid);
+      if (!el) { out[sid] = null; continue; }
+      const r = el.getBoundingClientRect();
+      out[sid] = { top: Math.round(r.top + window.scrollY), bottom: Math.round(r.bottom + window.scrollY), h: Math.round(r.height) };
+    }
+    return out;
+  }, ids);
+}
+
+async function runPage() {
+  const all = (pageMap.sections ?? []).filter((s) => s && s.id);
+  const flow = all.filter((s) => !s.overlay);
+  const TOLP = 2;
+  let issues = 0;
+  console.log(`PAGE — ${url} — ${flow.length} sections in design/page.json, design ${pageWidth}px`);
+  const notBuilt = new Set();
+
+  for (const width of widths) {
+    const { context, page } = await preparePage(width);
+    const pos = await pagePositions(page, all.map((s) => s.id));
+    const built = flow.filter((s) => pos[s.id]);
+    for (const s of flow) if (!pos[s.id]) notBuilt.add(s.id);
+    const lines = [];
+
+    // DOM order must follow the design order.
+    const order = [...built].sort((a, b) => pos[a.id].top - pos[b.id].top).map((s) => s.id);
+    const want = built.map((s) => s.id);
+    if (order.join() !== want.join()) lines.push(`   - order: ours ${order.join(" → ")} ≠ design ${want.join(" → ")}`);
+
+    if (width === pageWidth) {
+      // Exact positions. Report the first section where the difference appears — everything below shifts with it.
+      let firstOff = null;
+      const rows = [];
+      for (const s of built) {
+        const d = pos[s.id].top - Number(s.y);
+        rows.push(`${s.id} ${pos[s.id].top}/${s.y}${Math.abs(d) > TOLP ? ` (${d > 0 ? "+" : ""}${d})` : ""}`);
+        if (Math.abs(d) > TOLP && !firstOff) firstOff = { s, d };
+      }
+      lines.unshift(`   y ours/design: ${rows.join(" · ")}`);
+      if (firstOff) {
+        const i = built.indexOf(firstOff.s);
+        const prev = built[i - 1];
+        const why = prev
+          ? `gap after ${prev.id}: ours ${pos[firstOff.s.id].top - pos[prev.id].bottom} ≠ design ${firstOff.s.gapBefore ?? Number(firstOff.s.y) - (Number(prev.y) + Number(prev.height))}` +
+            (Math.abs(pos[prev.id].h - Number(prev.height)) > TOLP ? `; ${prev.id} height ours ${pos[prev.id].h} ≠ design ${prev.height}` : "")
+          : "first section starts at the wrong place";
+        lines.push(`   - ${firstOff.s.id} starts at y ${pos[firstOff.s.id].top} ≠ design ${firstOff.s.y} (${firstOff.d > 0 ? "+" : ""}${firstOff.d}px): ${why}`);
+      }
+    }
+
+    // Every width: no overlaps; sections with a gap in Figma must not touch.
+    for (let i = 1; i < built.length; i++) {
+      const prev = built[i - 1], cur = built[i];
+      if (flow.indexOf(cur) !== flow.indexOf(prev) + 1) continue; // a section between them is not built yet
+      const gap = pos[cur.id].top - pos[prev.id].bottom;
+      const designGap = cur.gapBefore ?? Number(cur.y) - (Number(prev.y) + Number(prev.height));
+      if (gap < -1) lines.push(`   - ${cur.id} overlaps ${prev.id} by ${-gap}px`);
+      else if (designGap > 0 && gap <= 0) lines.push(`   - ${cur.id} touches ${prev.id}: gap 0, design ${designGap}px (mt-section-* missing?)`);
+    }
+
+    const bad = lines.some((l) => l.startsWith("   - "));
+    issues += lines.filter((l) => l.startsWith("   - ")).length;
+    console.log(`[${width}] ${bad ? "ISSUES" : "OK"} · ${built.length}/${flow.length} sections on the page`);
+    for (const l of lines) console.log(l);
+    await context.close();
+  }
+  if (notBuilt.size) console.log(`Not built yet (skipped): ${[...notBuilt].join(", ")}`);
+  await browser.close();
+  console.log(issues ? `RESULT: ${issues} issue(s)` : "RESULT: OK");
+  process.exit(issues ? 1 : 0);
+}
+if (pageMode) await runPage();
 
 // ---------- run ----------
 let total = 0;

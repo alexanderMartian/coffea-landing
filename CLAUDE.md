@@ -20,10 +20,10 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 | 0 | Header | `header` | `2013:2` | ✅ | Nav bar, floats over Hero; in app/layout.tsx; pixel diff n/a (transparent bg) |
 | 1 | Hero | `hero` | `2013:3` | ✅ | font diff ~3.6% (Playfair rendering) |
 | 2 | Categories | `categories` | `2013:4` | ✅ | Outfit → Poppins (sans font); pixel diff 1.8% |
-| 3 | Coffee Menu | `coffee-menu` | `2013:5` | ✅ | ProductCard + ProductSection + CarouselRow; spec 29/29; pixel diff 3.7%; text-cut-off at <1920 = carousel scroll behavior (expected) |
-| 4 | Dessert Menu | `dessert-menu` | `2013:6` | ✅ | Shared card component with Coffee Menu; pixel diff 4.0%; text-cut-off at <1920 = carousel scroll behavior (expected) |
-| 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 5.2% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |
-| 6 | Testimonials | `testimonials` | `2013:8` | ⬜ | |
+| 3 | Coffee Menu | `coffee-menu` | `2013:5` | ✅ | ProductCard + ProductSection + CarouselRow; spec 34/34; pixel diff 3.9%; heart pos fixed; text-cut-off at <1920 = carousel scroll behavior (expected) |
+| 4 | Dessert Menu | `dessert-menu` | `2013:6` | ✅ | Shared card component with Coffee Menu; spec 34/34; pixel diff 3.2%; heart pos fixed; text-cut-off at <1920 = carousel scroll behavior (expected) |
+| 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 3.9% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |
+| 6 | Testimonials | `testimonials` | `2013:8` | ✅ | spec 34/34; pixel diff 6.8% (avatar photo + placeholder content); uppercase heading; Reggae One added; mobile stack; text-box trim |
 | 7 | Newsletter | `newsletter` | `0:239` | ⬜ | |
 | 8 | Footer | `footer` | `2013:9` | ⬜ | |
 
@@ -42,6 +42,7 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - `pnpm qa:visual [paths...]` — screenshots + layout checks at 375/768/1440 (dev server must run)
 - `pnpm qa:lh` — Lighthouse summary (production server must run)
 - `node scripts/section-check.mjs <section-id> [--widths 360,1920]` — one section vs `design/<id>.*` + layout rules at 360–2560 → `.qa/sections/` (used by `figma-import`)
+- `node scripts/section-check.mjs --page` — every section's position on the page vs `design/page.json` (gaps between sections)
 - shadcn component: `pnpm dlx shadcn@latest add <name>`
 
 ## Structure
@@ -52,21 +53,23 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - `content/site.ts` — ALL texts, links, prices, contacts. Components never hardcode copy.
 - `lib/` — `utils.ts` (cn), `schemas.ts` (Zod schemas shared by client and server)
 - `public/` — images, favicons (`public/images/<section-id>/` — assets exported from Figma)
-- `design/` — Figma references per section: `<id>.png` (frame export) and `<id>.spec.json` (key values). Written by `figma-import`; `*.png` there is gitignored
+- `design/` — Figma references: `page.json` (section positions and gaps), per section `<id>.png` (frame export) and `<id>.spec.json` (key values). Written by `figma-import`; `*.png` there is gitignored
 
 ## Conventions
 - Server Components by default. `"use client"` only for interactivity (Motion, forms, toggles) and keep those components small.
-- Mobile-first Tailwind. Check 375px first. No fixed widths on text containers.
+- Mobile-first Tailwind. Check 360px first.
+- No fixed heights on text, cards or sections: no `h-*`, no `max-h-*` + `overflow-hidden` on text. Height comes from content; sections use `min-h-*`; text width via `max-w-*`. Fixed sizes only for icons, avatars, dots.
+- Spacing between sections: `mt-section-*` utilities (from `design/page.json`), set on the section in `app/page.tsx`; sections accept `className`.
 - Colors, radii, fonts come from theme tokens — no raw hex values in components. Merge classes with `cn()`.
 - Images: always `next/image` with `width`/`height` or `fill` + `sizes`. `priority` only on the hero (LCP) image.
-- Fonts: `next/font`, max 2 families, `display: "swap"`.
+- Fonts: `next/font`, families as in the design, `display: "swap"`. An extra family gets its own token/utility; never swap `--font-sans` for one section.
 - Animations: Motion only for enter/scroll reveals and small hovers; wrap the app in `<MotionConfig reducedMotion="user">`. Never animate layout-shifting properties on load.
 - Forms: one Zod schema in `lib/schemas.ts` → `zodResolver` on the client AND `safeParse` in the route handler. Add a honeypot field. Return `{ ok: boolean, error?: string }`.
 - Secrets only in env vars (`RESEND_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `CONTACT_TO_EMAIL`). Never `NEXT_PUBLIC_` for secrets. Keep `.env.example` updated.
 - SEO: `metadata` in `app/layout.tsx` with `metadataBase`, title template, description, `openGraph`; `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.(png|tsx)`. Exactly one `<h1>` per page; `<html lang>` set.
 - Accessibility: semantic tags (`header`, `main`, `section` with headings, `footer`), labels on all inputs, visible focus, links for navigation / buttons for actions, alt text on meaningful images (`alt=""` on decorative).
 - TypeScript strict: no `any`, no unnecessary `!`.
-- Never invent testimonials, reviews, client logos, stats or awards. Use clearly marked placeholders: `[PLACEHOLDER: ...]`.
+- Never invent testimonials, reviews, client logos, stats or awards. Design copy (Lorem ipsum included) is rendered verbatim; fake copy is marked with a `// PLACEHOLDER: ...` comment above the field in `content/site.ts` — never inside the rendered text or `alt`. `alt` describes the image.
 
 ## Definition of Done
 1. Section/feature done → `pnpm lint` and `pnpm typecheck` pass.

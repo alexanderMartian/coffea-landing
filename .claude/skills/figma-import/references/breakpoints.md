@@ -27,6 +27,10 @@
 ```
 Values are examples — compute yours from the design (formula below). Utilities: `text-display`, `text-h2`, `py-section`, `max-w-content`, `3xl:`.
 
+Tailwind v4 notes:
+- shadcn puts its tokens into `@theme inline`. Variables there are compiled into the utilities and are **not** emitted as CSS variables in `:root` unless used, so `var(--my-token)` in your own CSS can be empty. Put your own tokens into a plain `@theme { … }` block.
+- Custom classes: use `@utility name { … }`, not `@layer utilities { .name { … } }`. Only `@utility` classes work with variants (`lg:`, `hover:`) and get sorted by Prettier.
+
 ## Container
 ```tsx
 <section id="services" className="bg-muted py-section">          {/* background: full-bleed */}
@@ -69,7 +73,28 @@ Line height in tokens is a **ratio** (Figma px / font size), so it scales with t
 | < 14 (legal, captions) | 12 | fixed + `data-allow-small` on the wrapper |
 Paragraph width: keep the design width as `max-w-*`, and never wider than ~70ch.
 
-## Spacing
+## Spacing between sections (from `design/page.json`)
+Figma section frames often sit at a distance from each other; that distance is not inside any section, so the per-section check can't see it. `figma-import` step 1 writes it into `design/page.json` as `gapBefore`.
+```css
+/* app/globals.css — one utility per distinct gapBefore, fluid 360 → 1920, max = design value */
+@utility mt-section-lg {
+  margin-top: clamp(2.5rem, 1.923rem + 2.564vw, 5rem); /* 40 → 80 px */
+}
+@utility mt-section-sm {
+  margin-top: clamp(2rem, 1.538rem + 2.051vw, 4rem);   /* 32 → 64 px */
+}
+```
+```tsx
+// app/page.tsx — the page owns the rhythm; sections accept className and merge it with cn()
+<ProductSection id="coffee-menu" className="mt-section-lg" … />
+<Promo className="mt-section-sm" />
+```
+- Mobile minimum ≈ half of the design gap (never below 24 px). Name by size (`-sm`, `-lg`) or role (`-tight`).
+- Margin, not padding: a section with a background must not grow into the gap.
+- `gapBefore: 0` → no class (sections touch in the design).
+- Verify with `node scripts/section-check.mjs --page`.
+
+## Spacing inside sections
 - Section vertical padding: `py-section` (fluid). Sections with a different design padding get their own token.
 - Gaps ≥ 48 px: step down — `gap-8 md:gap-12 xl:gap-[design]` — or a fluid token if used often.
 - Gaps ≤ 32 px: keep the design value at all widths unless the 360 check shows cramping.
