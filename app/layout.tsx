@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Outfit, Poppins } from "next/font/google";
+import { Playfair_Display, Outfit, Poppins, Reggae_One } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/sections/Header";
 
@@ -22,6 +22,13 @@ const poppins = Poppins({
   display: "swap",
 });
 
+const reggae = Reggae_One({
+  variable: "--font-reggae-var",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Coffea",
   description: "The richest coffee in the city.",
@@ -31,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${outfit.variable} ${poppins.variable} h-full antialiased`}
+      className={`${playfair.variable} ${outfit.variable} ${poppins.variable} ${reggae.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
           <Header />

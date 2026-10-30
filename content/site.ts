@@ -121,4 +121,47 @@ export const site = {
     cta: "Explore Our Products",
     ctaHref: "#coffee-menu",
   },
+  testimonials: {
+    eyebrow: "Come and Join",
+    heading: "our happy customers",
+    // DOM order: featured card first (best UX on mobile); desktop visual order via lg:order-*
+    items: [
+      {
+        avatar: "/images/testimonials/avatar-placeholder.jpg",
+        // PLACEHOLDER: real customer photo
+        avatarAlt: "",
+        // PLACEHOLDER: customer name (lorem/name from the design — node 0:198)
+        name: "James Smith",
+        // PLACEHOLDER: customer role (from the design — node 0:199)
+        role: "Entrepreneur",
+        rating: 5,
+        // PLACEHOLDER: lorem from the design (node 0:206)
+        body: "Lorem ipsum dolor sit amet, consectetur adipisicing ,Lorem ipsum dolor sit amet, consectetur adipisicing  dolor sit amet, consectetur adipisicing elit,Lorem ipsum  amet, consectetur adipisicing elit,Lorem ipsum dolor sit  adipisicing elit,Lorem ipsum dolor sit   dolor sit amet, consectetur adipisicing elit,",
+      },
+      {
+        avatar: "/images/testimonials/avatar-placeholder.jpg",
+        // PLACEHOLDER: real customer photo
+        avatarAlt: "",
+        // PLACEHOLDER: customer name (lorem/name from the design — node 0:216)
+        name: "James Smith",
+        // PLACEHOLDER: customer role (from the design — node 0:217)
+        role: "Entrepreneur",
+        rating: 4,
+        // PLACEHOLDER: lorem from the design (node 0:224)
+        body: "Lorem ipsum dolor sit amet, consectetur adipisicing ,Lorem ipsum dolor sit amet, consectetur adipisicing  dolor sit amet, consectetur adipisicing elit,Lorem ipsum  amet, consectetur adipisicing elit,Lorem ipsum dolor sit  adipisicing elit,Lorem ipsum dolor sit   dolor sit amet, consectetur adipisicing elit,",
+      },
+      {
+        avatar: "/images/testimonials/avatar-placeholder.jpg",
+        // PLACEHOLDER: real customer photo
+        avatarAlt: "",
+        // PLACEHOLDER: customer name (lorem/name from the design — node 0:230)
+        name: "James Smith",
+        // PLACEHOLDER: customer role (from the design — node 0:231)
+        role: "Entrepreneur",
+        rating: 3,
+        // PLACEHOLDER: lorem from the design (node 0:238)
+        body: "Lorem ipsum dolor sit amet, consectetur adipisicing ,Lorem ipsum dolor sit amet, consectetur adipisicing  dolor sit amet, consectetur adipisicing elit,Lorem ipsum  amet, consectetur adipisicing elit,Lorem ipsum dolor sit  adipisicing elit,Lorem ipsum dolor sit   dolor sit amet, consectetur adipisicing elit,",
+      },
+    ],
+  },
 } as const;
