@@ -10,6 +10,7 @@
     "coffee-menu-card-title": { "fontSize": 38, "fontWeight": 600, "fontFamily": "Outfit", "color": "#30261c" },
     "coffee-menu-card-desc":  { "fontSize": 20, "fontWeight": 400, "fontFamily": "Outfit", "lineHeight": 28, "color": "#2a0000" },
     "coffee-menu-card-price": { "fontSize": 20, "fontWeight": 600, "fontFamily": "Poppins", "color": "#2a0000" },
-    "coffee-menu-card-btn":   { "h": 41, "radius": 8, "bg": "#2a0000", "color": "#ffffff", "fontSize": 14 }
+    "coffee-menu-card-btn":   { "h": 41, "radius": 8, "bg": "#2a0000", "color": "#ffffff", "fontSize": 14 },
+    "coffee-menu-card-heart": { "x": 432, "y": 141, "w": 33, "h": 33 }
   }
 }

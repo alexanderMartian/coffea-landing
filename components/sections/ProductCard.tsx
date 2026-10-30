@@ -44,8 +44,9 @@ export default function ProductCard({
           />
         </div>
         <Heart
-          size={28}
-          className="absolute top-8 right-3 stroke-[#f1f0ee] fill-none"
+          data-spec={s && `${s}-card-heart`}
+          size={33}
+          className="absolute top-[18px] right-[27px] stroke-[#f1f0ee] fill-none"
           aria-hidden
         />
       </div>
