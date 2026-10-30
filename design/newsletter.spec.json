@@ -1,0 +1,14 @@
+{
+  "section": "newsletter",
+  "nodeId": "0:239",
+  "frame": { "width": 1920, "height": 320 },
+  "elements": {
+    "newsletter":          { "h": 320, "bg": "#e2d9c8" },
+    "newsletter-title":    { "fontSize": 32, "fontWeight": 600, "fontFamily": "Poppins", "color": "#30261c" },
+    "newsletter-subtitle": { "y": 142, "fontSize": 16, "fontWeight": 500, "fontFamily": "Poppins", "color": "#30261c" },
+    "newsletter-input":    { "x": 703, "y": 190, "w": 364, "h": 44, "radius": 100, "bg": "#f1f0ee", "paddingTop": 10, "paddingRight": 190, "paddingBottom": 10, "paddingLeft": 24 },
+    "newsletter-btn":      { "x": 1079, "y": 190, "w": 138, "h": 44, "radius": 100, "bg": "#30261c", "color": "#f1f0ee", "fontSize": 16, "fontWeight": 600 },
+    "newsletter-img-left": { "x": 0, "y": 0, "w": 482, "h": 321 },
+    "newsletter-img-right":{ "x": 1438, "y": 0, "w": 482, "h": 321 }
+  }
+}

@@ -3,6 +3,7 @@ import Categories from "@/components/sections/Categories";
 import ProductSection from "@/components/sections/ProductSection";
 import Promo from "@/components/sections/Promo";
 import Testimonials from "@/components/sections/Testimonials";
+import Newsletter from "@/components/sections/Newsletter";
 import { site } from "@/content/site";
 
 export default function Home() {
@@ -24,6 +25,7 @@ export default function Home() {
       />
       <Promo className="mt-section-sm" />
       <Testimonials className="mt-section-sm" />
+      <Newsletter className="mt-section-sm" />
     </main>
   );
 }

@@ -164,4 +164,12 @@ export const site = {
       },
     ],
   },
+  newsletter: {
+    // Typos fixed vs design: "ger" → "get", "in get" → "and get"
+    heading: "Join in and get 15% off!",
+    subheading: "Subscribe to our newsletter and get 15% off discount code.",
+    inputPlaceholder: "Email address",
+    cta: "Subscribe",
+    imageAlt: "",
+  },
 } as const;

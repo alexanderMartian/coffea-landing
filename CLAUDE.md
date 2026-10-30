@@ -24,7 +24,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 | 4 | Dessert Menu | `dessert-menu` | `2013:6` | ✅ | Shared card component with Coffee Menu; spec 34/34; pixel diff 3.2%; heart pos fixed; text-cut-off at <1920 = carousel scroll behavior (expected) |
 | 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 3.9% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |
 | 6 | Testimonials | `testimonials` | `2013:8` | ✅ | spec 34/34; pixel diff 6.8% (avatar photo + placeholder content); uppercase heading; Reggae One added; mobile stack; text-box trim |
-| 7 | Newsletter | `newsletter` | `0:239` | ⬜ | |
+| 7 | Newsletter | `newsletter` | `0:239` | ✅ | spec 38/38; pixel diff 1.5%; mix-blend-multiply on bean photos; mobile stacked form; typos fixed: "ger"→"get", "in get"→"and get" |
 | 8 | Footer | `footer` | `2013:9` | ⬜ | |
 
 Status: ⬜ not started · 🔄 in progress · ✅ done (spec match at 1920 + rules OK at 360–2560 + lint/typecheck + committed)
