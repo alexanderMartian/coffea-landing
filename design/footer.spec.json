@@ -1,0 +1,16 @@
+{
+  "section": "footer",
+  "nodeId": "2013:9",
+  "frame": { "width": 1920, "height": 358 },
+  "elements": {
+    "footer": { "h": 358, "bg": "#30261c" },
+    "footer-logo": { "x": 238, "y": 80, "w": 116, "h": 48, "fontFamily": "Playfair Display", "fontWeight": 700, "color": "#ffffff", "_note": "fontSize mixed in Figma: first letter larger (small-caps look); no single fontSize to check" },
+    "footer-privacy-heading": { "x": 459, "y": 96, "fontSize": 24, "fontFamily": "Playfair Display", "fontWeight": 500, "color": "#ffffff", "_note": "uppercase in design" },
+    "footer-services-heading": { "x": 698, "y": 96, "fontSize": 24, "fontFamily": "Playfair Display", "fontWeight": 500, "color": "#ffffff", "_note": "uppercase in design" },
+    "footer-about-heading": { "x": 928, "y": 96, "fontSize": 24, "fontFamily": "Playfair Display", "fontWeight": 500, "color": "#ffffff", "_note": "uppercase in design" },
+    "footer-information-heading": { "x": 1175, "y": 96, "fontSize": 24, "fontFamily": "Playfair Display", "fontWeight": 500, "color": "#ffffff", "_note": "uppercase in design" },
+    "footer-privacy-link": { "x": 459, "y": 152, "fontSize": 18, "fontFamily": "Poppins", "fontWeight": 400, "color": "#ffffff" },
+    "footer-social-heading": { "x": 1507, "y": 98, "fontSize": 24, "fontFamily": "Playfair Display", "fontWeight": 700, "color": "#ffffff", "_note": "uppercase in design" },
+    "footer-social-icon": { "x": 1529, "y": 165, "w": 24, "h": 24 }
+  }
+}

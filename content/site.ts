@@ -172,4 +172,56 @@ export const site = {
     cta: "Subscribe",
     imageAlt: "",
   },
+  footer: {
+    // NOTE: header logo reads "Coffea"; footer logo reads "Coffee" — intentional brand difference?
+    logo: "Coffee",
+    columns: [
+      {
+        heading: "PRIVACY",
+        links: [
+          // TODO: replace # with real URLs
+          { label: "Terms of use", href: "#" },
+          { label: "Privacy policy", href: "#" },
+          { label: "Cookies", href: "#" },
+        ],
+      },
+      {
+        heading: "SERVICES",
+        links: [
+          { label: "Shop", href: "#" },
+          { label: "Order ahead", href: "#" },
+          { label: "Menu", href: "#coffee-menu" },
+        ],
+      },
+      {
+        heading: "ABOUT US",
+        links: [
+          { label: "Find a location", href: "#" },
+          { label: "About us", href: "#" },
+          // Typo fixed: "Out story" → "Our story"
+          { label: "Our story", href: "#" },
+        ],
+      },
+      {
+        // Typo fixed: "INFOTNATION" → "INFORMATION"
+        heading: "INFORMATION",
+        links: [
+          // Typo fixed: "Plons & pricing" → "Plans & pricing"
+          { label: "Plans & pricing", href: "#" },
+          // Typo fixed: "Sell your prodcts" → "Sell your products"
+          { label: "Sell your products", href: "#" },
+          { label: "Jobs", href: "#" },
+        ],
+      },
+    ],
+    social: {
+      heading: "SOCIAL MEDIA",
+      links: [
+        { label: "X", href: "#", icon: "/images/footer/icon-x.svg" },
+        { label: "Instagram", href: "#", icon: "/images/footer/icon-instagram.svg" },
+        { label: "Facebook", href: "#", icon: "/images/footer/icon-facebook.svg" },
+        { label: "LinkedIn", href: "#", icon: "/images/footer/icon-linkedin.svg" },
+      ],
+    },
+  },
 } as const;

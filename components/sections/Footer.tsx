@@ -1,0 +1,94 @@
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { site } from "@/content/site";
+
+export default function Footer({ className }: { className?: string }) {
+  return (
+    <footer
+      id="footer"
+      className={cn("bg-foreground", className)}
+    >
+      <div className="mx-auto w-full max-w-content px-4 md:px-8 3xl:px-0 py-10 lg:py-16 3xl:pt-[80px] 3xl:pb-[95px]">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 3xl:gap-0 3xl:items-start">
+
+          {/* Logo */}
+          <div className="3xl:w-[221px] 3xl:shrink-0">
+            <span
+              data-spec="footer-logo"
+              className="font-display font-bold text-white [font-variant-caps:small-caps] text-[1.75rem] 3xl:text-[2.4rem] leading-[1.2] inline-block"
+            >
+              {site.footer.logo}
+            </span>
+          </div>
+
+          {/* Nav columns */}
+          <nav aria-label="Footer" className="flex-1 3xl:pt-[16px]">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 3xl:grid-cols-[239px_230px_247px_auto] 3xl:gap-0">
+              {site.footer.columns.map((col, i) => {
+                const specKeys = [
+                  "footer-privacy-heading",
+                  "footer-services-heading",
+                  "footer-about-heading",
+                  "footer-information-heading",
+                ] as const;
+                return (
+                <div key={col.heading}>
+                  <h3
+                    data-spec={specKeys[i]}
+                    className="font-display font-medium text-base 3xl:text-2xl text-white uppercase leading-[1.333]"
+                  >
+                    {col.heading}
+                  </h3>
+                  <ul className="mt-4 3xl:mt-6 flex flex-col gap-3 3xl:gap-[15px]">
+                    {col.links.map((link, j) => (
+                      <li key={link.label}>
+                        {/* TODO: replace # with real URLs */}
+                        <a
+                          href={link.href}
+                          data-spec={i === 0 && j === 0 ? "footer-privacy-link" : undefined}
+                          className="font-alt text-sm 3xl:text-lg text-white inline-flex items-center min-h-11 min-w-[44px] lg:min-h-0 lg:min-w-0 leading-[1.5]"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                );
+              })}
+            </div>
+          </nav>
+
+          {/* Social Media */}
+          <div className="3xl:w-[175px] 3xl:shrink-0 3xl:pt-[18px]">
+            <h3
+              data-spec="footer-social-heading"
+              className="font-display font-bold text-base 3xl:text-2xl text-white uppercase leading-[1.333] whitespace-nowrap"
+            >
+              {site.footer.social.heading}
+            </h3>
+            <div className="mt-4 3xl:mt-[35px] flex gap-3 3xl:gap-[12px] 3xl:justify-center">
+              {site.footer.social.links.map((s, i) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  aria-label={s.label}
+                  className="inline-flex items-center justify-center w-11 h-11 lg:w-auto lg:h-auto"
+                >
+                  <Image
+                    data-spec={i === 0 ? "footer-social-icon" : undefined}
+                    src={s.icon}
+                    alt=""
+                    width={24}
+                    height={24}
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </footer>
+  );
+}

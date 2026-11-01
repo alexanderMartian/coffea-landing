@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Outfit, Poppins, Reggae_One } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/sections/Header";
+import Footer from "@/components/sections/Footer";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
           <Header />
           {children}
+          <Footer />
         </body>
     </html>
   );
