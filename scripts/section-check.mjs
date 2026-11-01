@@ -12,7 +12,8 @@
 //   design/page.json               page map (--page): { pageWidth, sections: [{ id, nodeId, y, height, gapBefore, overlay? }] }
 //
 // Section mode: at the design width (spec.frame.width, default 1920) it measures every [data-spec] element against
-// the spec and makes a pixel diff with design/<id>.png. At every width it runs layout rules (overflow, small text,
+// the spec, finds every text of spec.texts at its Figma position (±3 px, typo-tolerant), and makes a pixel diff
+// with design/<id>.png (transparent parts of the reference are not compared; red zones are listed; > 10% = issue). At every width it runs layout rules (overflow, small text,
 // tap targets, overlaps, clipped text, upscaled images, invisible blocks). A text height mismatch that matches the
 // Figma "Vertical trim" signature gets a hint.
 // Page mode: at the design width every built section must start at its Figma y (±2 px); at smaller widths sections
@@ -219,6 +220,7 @@ async function measure(page, keys) {
   );
 }
 
+const DIFF_LIMIT = 10; // % — above it the section is not done until the red zones are explained
 const TOL = { x: 2, y: 2, w: 2, h: 2, fontSize: 0.5, lineHeight: 1, letterSpacing: 0.3, radius: 1, gap: 2, rowGap: 2, columnGap: 2, paddingTop: 2, paddingRight: 2, paddingBottom: 2, paddingLeft: 2 };
 const hexDist = (a, b) => {
   if (a === b) return 0;
@@ -266,6 +268,70 @@ function trimHint(got, want) {
   return "";
 }
 
+// ---------- text map: every Figma text must be on the page at its place ----------
+// spec.texts = [{ text, x, y, w?, align? }] — x/y/w of the Figma text box relative to the frame,
+// align = LEFT | CENTER | RIGHT (textAlignHorizontal). Texts are matched by similarity, so a fixed typo
+// ("prodcts" → "products") still finds its element; each element is used once.
+const TEXT_TOL = 3;
+async function checkTexts(page, texts) {
+  const found = await page.evaluate(
+    ({ sid, texts, fx, fy }) => {
+      const section = document.getElementById(sid);
+      const sr = section.getBoundingClientRect();
+      const norm = (s) => String(s).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim();
+      const grams = (s) => { const g = new Map(); const t = ` ${s} `; for (let i = 0; i < t.length - 1; i++) { const k = t.slice(i, i + 2); g.set(k, (g.get(k) || 0) + 1); } return g; };
+      const sim = (a, b) => {
+        if (a === b) return 1;
+        const A = grams(a), B = grams(b); let both = 0, n = 0;
+        for (const [k, v] of A) { both += Math.min(v, B.get(k) || 0); n += v; }
+        for (const v of B.values()) n += v;
+        return n ? (2 * both) / n : 0;
+      };
+      // Text leaves plus their parents: a text split into spans (logo "C" + "offee") is matched as a whole.
+      const base = window.__textLeaves(section);
+      const els = [...new Set([...base, ...base.map((e) => e.parentElement).filter((p) => p && section.contains(p) && p !== section && (p.textContent || "").trim().length <= 80)])];
+      const leaves = els.map((el) => {
+        const own = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(" ");
+        const range = document.createRange(); range.selectNodeContents(el);
+        const rr = range.getBoundingClientRect(), er = el.getBoundingClientRect();
+        const inline = getComputedStyle(el).display.startsWith("inline");
+        return {
+          el, label: window.__label(el), t: norm(el.textContent || own),
+          left: rr.left - sr.left - fx, right: rr.right - sr.left - fx,
+          top: (inline ? rr.top : er.top) - sr.top - fy,
+        };
+      });
+      const used = new Set();
+      return texts.map((want) => {
+        const t = norm(want.text);
+        const ax = String(want.align || "LEFT").toUpperCase();
+        const wx = ax === "CENTER" ? want.x + (want.w || 0) / 2 : ax === "RIGHT" ? want.x + (want.w || 0) : want.x;
+        let best = null;
+        for (const l of leaves) {
+          if (used.has(l)) continue;
+          const s = sim(t, l.t);
+          if (s < 0.6) continue;
+          const lx = ax === "CENTER" ? (l.left + l.right) / 2 : ax === "RIGHT" ? l.right : l.left;
+          const dist = Math.hypot(lx - wx, l.top - want.y);
+          // prefer the most similar text; among equally similar ones the nearest
+          if (!best || s > best.s + 0.05 || (Math.abs(s - best.s) <= 0.05 && dist < best.dist)) best = { l, s, lx, dist };
+        }
+        if (!best) return { text: want.text, missing: true };
+        used.add(best.l);
+        return { text: want.text, found: best.l.t, label: best.l.label, dx: Math.round(best.lx - wx), dy: Math.round(best.l.top - want.y), x: Math.round(best.lx), y: Math.round(best.l.top) };
+      });
+    },
+    { sid: id, texts: texts.filter((t) => t && t.text), fx: frameX, fy: frameY }
+  );
+  return found.map((r) => {
+    if (r.missing) return { ...r, fail: `"${r.text}": not found in the section` };
+    const off = [];
+    if (Math.abs(r.dx) > TEXT_TOL) off.push(`x ${r.dx > 0 ? "+" : ""}${r.dx}`);
+    if (Math.abs(r.dy) > TEXT_TOL) off.push(`y ${r.dy > 0 ? "+" : ""}${r.dy}`);
+    return off.length ? { ...r, fail: `"${r.text}" is off by ${off.join(", ")} px (ours x ${r.x} y ${r.y})` } : r;
+  });
+}
+
 // ---------- pixel diff (in a blank page, no extra deps) ----------
 async function pixelDiff(oursB64, designB64) {
   const page = await browser.newPage();
@@ -282,17 +348,30 @@ async function pixelDiff(oursB64, designB64) {
       const H = Math.max(oursH, dH);
       const mk = () => { const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d", { willReadFrequently: true }); x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); return [c, x]; };
       const [, a] = mk(); a.drawImage(ours, fx, fy, W, oursH, 0, 0, W, oursH);
-      const [, b] = mk(); b.drawImage(design, 0, 0, W, dH);
+      // Transparent parts of the reference (header over a photo, frames without a fill) show OUR pixels
+      // underneath, so only what Figma actually paints is compared.
+      const [, b] = mk(); b.drawImage(ours, fx, fy, W, oursH, 0, 0, W, oursH); b.drawImage(design, 0, 0, W, dH);
+      const [, t] = mk(); t.clearRect(0, 0, W, H); t.drawImage(design, 0, 0, W, dH);
+      const T = t.getImageData(0, 0, W, dH).data;
+      let clear = 0;
+      for (let p = 3; p < T.length; p += 4) if (T[p] < 128) clear++;
+      const transparentPct = (clear / (W * dH)) * 100;
       const A = a.getImageData(0, 0, W, H).data, B = b.getImageData(0, 0, W, H).data;
       const [outC, o] = mk();
       const img = o.createImageData(W, H), D = img.data;
       const BAND = 40, bands = new Array(Math.ceil(H / BAND)).fill(0);
+      const CELL = 20, cols = Math.ceil(W / CELL), cells = new Uint32Array(cols * Math.ceil(H / CELL));
       let diff = 0;
       for (let p = 0; p < A.length; p += 4) {
         const d = Math.max(Math.abs(A[p] - B[p]), Math.abs(A[p + 1] - B[p + 1]), Math.abs(A[p + 2] - B[p + 2]));
         const g = (B[p] * 0.3 + B[p + 1] * 0.59 + B[p + 2] * 0.11) * 0.35 + 165; // faded design as background
-        if (d > 40) { diff++; bands[Math.floor(p / 4 / W / BAND)]++; D[p] = 230; D[p + 1] = 30; D[p + 2] = 30; }
-        else { D[p] = D[p + 1] = D[p + 2] = g; }
+        if (d > 40) {
+          diff++;
+          const i = p / 4, y = Math.floor(i / W), x = i % W;
+          bands[Math.floor(y / BAND)]++;
+          cells[Math.floor(y / CELL) * cols + Math.floor(x / CELL)]++;
+          D[p] = 230; D[p + 1] = 30; D[p + 2] = 30;
+        } else { D[p] = D[p + 1] = D[p + 2] = g; }
         D[p + 3] = 255;
       }
       o.putImageData(img, 0, 0);
@@ -301,7 +380,25 @@ async function pixelDiff(oursB64, designB64) {
         .filter((x) => x.pct >= 5)
         .sort((x, y) => y.pct - x.pct)
         .slice(0, 3);
-      return { pct: (diff / (W * H)) * 100, oursH, designH: dH, top, png: outC.toDataURL("image/png").split(",")[1] };
+      // Red zones: 20px cells with ≥ 8% red pixels, joined with their neighbours → bounding boxes.
+      const hot = (k) => cells[k] >= CELL * CELL * 0.08;
+      const seen = new Uint8Array(cells.length), zones = [];
+      for (let k = 0; k < cells.length; k++) {
+        if (seen[k] || !hot(k)) continue;
+        const stack = [k]; seen[k] = 1;
+        let x1 = Infinity, y1 = Infinity, x2 = -1, y2 = -1, n = 0;
+        while (stack.length) {
+          const c = stack.pop(), cx = c % cols, cy = Math.floor(c / cols);
+          n += cells[c]; x1 = Math.min(x1, cx); x2 = Math.max(x2, cx); y1 = Math.min(y1, cy); y2 = Math.max(y2, cy);
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) {
+            const nx = cx + dx, ny = cy + dy, nk = ny * cols + nx;
+            if (nx >= 0 && nx < cols && ny >= 0 && nk < cells.length && !seen[nk] && hot(nk)) { seen[nk] = 1; stack.push(nk); }
+          }
+        }
+        zones.push({ x1: x1 * CELL, y1: y1 * CELL, x2: Math.min(W, (x2 + 1) * CELL), y2: Math.min(H, (y2 + 1) * CELL), n });
+      }
+      zones.sort((p, q) => q.n - p.n);
+      return { pct: (diff / (W * H)) * 100, oursH, designH: dH, top, zones: zones.slice(0, 5), transparentPct, png: outC.toDataURL("image/png").split(",")[1] };
     },
     { oursB64, designB64, fw: designWidth, fx: frameX, fy: frameY }
   );
@@ -489,12 +586,27 @@ for (const width of widths) {
       if (fails.length > 12) lines.push(`   … and ${fails.length - 12} more`);
       total += fails.length;
     }
+    if (Array.isArray(spec?.texts) && spec.texts.length) {
+      const res = await checkTexts(page, spec.texts);
+      const fails = res.filter((r) => r.fail);
+      lines.push(`${lines.length ? "   " : ""}texts ${res.length - fails.length}/${res.length} OK`);
+      for (const r of fails.slice(0, 12)) lines.push(`   - ${r.fail}`);
+      if (fails.length > 12) lines.push(`   … and ${fails.length - 12} more`);
+      total += fails.length;
+    }
     if (existsSync(designPngPath)) {
       const d = await pixelDiff(buf.toString("base64"), readFileSync(designPngPath).toString("base64"));
       const diffPath = join(OUT, `${id}-diff.png`);
       writeFileSync(diffPath, Buffer.from(d.png, "base64"));
       const bands = d.top.map((b) => `${b.from}–${b.to}px ${b.pct.toFixed(0)}%`).join(", ");
-      lines.push(`pixel diff ${d.pct.toFixed(1)}%${bands ? ` (worst rows: ${bands})` : ""} → ${diffPath}`);
+      lines.push(`${lines.length ? "   " : ""}pixel diff ${d.pct.toFixed(1)}%${bands ? ` (worst rows: ${bands})` : ""} → ${diffPath}`);
+      if (d.transparentPct > 20) lines.push(`   reference is ${d.transparentPct.toFixed(0)}% transparent — only what Figma paints is compared`);
+      if (d.zones.length)
+        lines.push(`   red zones (x × y, relative to the frame): ${d.zones.map((z) => `${z.x1}–${z.x2} × ${z.y1}–${z.y2}`).join(" · ")}`);
+      if (d.pct > DIFF_LIMIT) {
+        lines.push(`   - pixel diff ${d.pct.toFixed(1)}% > ${DIFF_LIMIT}%: open ${diffPath} and name what each red zone is before marking the section done`);
+        total++;
+      }
       if (!frameX && !frameY && Math.abs(d.oursH - d.designH) > 4) { lines.push(`   - height: ours ${d.oursH} ≠ design ${d.designH}`); total++; }
     }
   } else if (width > pageWidth && Object.keys(atDesign).length) {

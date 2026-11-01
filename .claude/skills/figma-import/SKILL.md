@@ -24,7 +24,7 @@ description: Builds one landing section at a time from a Figma desktop frame thr
 | Reference image, assets → files | `save_screenshots` |
 
 Edit tools and `run_script` are denied in `.claude/settings.json` — never try to change the Figma file.
-Not exported by the Bridge — check the reference image or ask the user: text case (UPPERCASE), Vertical trim (`leadingTrim`), child fill/hug sizing.
+Not exported by the Bridge — check the reference image or ask the user: text case (UPPERCASE), Vertical trim (`leadingTrim`), child fill/hug sizing. Check `blendMode` on image nodes when it is present (`MULTIPLY` → `mix-blend-multiply`).
 
 ## 0. Preconditions — check, stop with a short Ukrainian message if any fails
 - `list_files` returns the design file. If not: «Відкрий Figma Desktop → копію макета → Plugins → Development → Figma MCP Bridge і напиши "далі"». The file must be a copy in the user's drafts (the plugin needs edit access on the free plan).
@@ -84,14 +84,22 @@ Not exported by the Bridge — check the reference image or ask the user: text c
    - Keys = `data-spec` values in the code; the section's own key = its `id` (no `data-spec` on `<section>`).
    - Props: `x y w h` (px, relative to the Figma frame's top-left), `fontSize lineHeight fontWeight letterSpacing fontFamily color bg radius paddingTop paddingRight paddingBottom paddingLeft gap rowGap columnGap`. Unit conversions are in `references/figma-mapping.md`. Keys starting with `_` are notes, ignored by the checker.
    - `x`/`y` only for anchors not placed by auto layout (sum the parents' `bounds` up to the section). Omit `w` for hug text (`textAutoResize: WIDTH_AND_HEIGHT`) and for fill children. Never invent values — only what `get_node` returned.
-   - **Must be in the spec:** every absolutely positioned icon, badge or control (a heart over a photo, carousel arrows, dots) with `x y w h`; every text with 2+ lines with `h` (the checker uses it to detect Vertical trim).
-4. Texts → `content/site.ts` **verbatim**, Lorem ipsum included. Fake copy gets a code comment above the field — `// PLACEHOLDER: lorem from the design` — never a marker inside the rendered string or `alt`. Real design texts (names, prices, buttons) are not placeholders.
+   - **Must be in the spec:** every absolutely positioned icon, badge, control or decorative image (a heart over a photo, carousel arrows, dots, side decor) with `x y w h`; `x`/`y` of the main elements of a centered block (input, button, subtitle); `x`/`y` of **every** item in a row of repeated items (each column heading, each card) — not only the first and the last; every text with 2+ lines with `h` (the checker uses it to detect Vertical trim).
+   - **`texts` — the text map:** every visible TEXT node of the section (max ~40; for repeated cards only the first card), copied from `get_node`: `{ "text": "<characters>", "x": …, "y": …, "w": …, "align": "LEFT|CENTER|RIGHT" }` — x/y summed up to the section frame, `w` = text box width, `align` = `textAlignHorizontal`. The checker finds each text on the page (typo-tolerant) and reports any text that is off by more than 3 px. It catches shifts the elements list doesn't cover (Footer: columns 2–4 were 22–70 px off with spec 31/31).
+```json
+"texts": [
+  { "text": "PRIVACY", "x": 459, "y": 96, "w": 99, "align": "LEFT" },
+  { "text": "Join in and ger 15% off!", "x": 777, "y": 88, "w": 366, "align": "CENTER" }
+]
+```
+4. Texts → `content/site.ts` **verbatim**, Lorem ipsum included. Fake copy gets a code comment above the field — `// PLACEHOLDER: lorem from the design` — never a marker inside the rendered string or `alt`. Real design texts (names, prices, buttons) are not placeholders. `PLACEHOLDER` means only "fake copy to replace" (it is grepped at handover) — typo fixes get `// Typos fixed vs design: "ger" → "get"`, questions get `// NOTE: …`.
    - **Case:** compare every heading, nav item and logo with `design/<id>.png` — Bridge doesn't export UPPERCASE. Keep `characters` as written, add `uppercase` when the image shows caps.
    - **Typos** ("Out Products", "INFOTNATION"): fix obvious ones and list each as «було → стало» in the report — the user confirms with the client (brand names and wordplay stay).
    - **Vertical trim:** a text box shorter than lines × lineHeight with all glyphs inside it means Figma Vertical trim ("Cap height to baseline"), not a design error. See `references/figma-mapping.md` → Text.
 
 ## 4. Responsive plan — mandatory stop
-Read `references/responsive-patterns.md`. Split the section into blocks, pick one pattern per block, post the plan in Ukrainian (max 8 lines) **and stop**:
+**Step 3 is finished before the plan:** spec (elements + texts), texts in `content/site.ts` and asset files are written. "No code before OK" means no component code — data files are part of step 3.
+Read `references/responsive-patterns.md`. Split the section into blocks, pick one pattern per block, post the plan in Ukrainian (max 8 lines) — starting with what step 3 wrote (`design/footer.spec.json — 12 elements, 20 texts · 4 icons in public/images/footer/`) — **and stop**:
 ```
 Block             Pattern       360           768        1280        ≥1920
 Text + image      split         stack, img↓   stack      2 cols      design
@@ -112,10 +120,12 @@ Read `references/figma-mapping.md` and `references/breakpoints.md` first.
 ## 6. Verify the design width (loop, max 3 iterations)
 1. `node scripts/section-check.mjs <id> --widths 1920`
 2. Fix every spec mismatch it prints (`hero-title fontSize: ours 64 ≠ design 72`). Numbers win over impressions. A `→ looks like Figma Vertical trim` hint: ask the user to confirm the setting in Figma, then apply the trim (figma-mapping.md → Text). Never cover a height difference with `h-*`, `max-h-*` + `overflow-hidden` or a magic gap.
-3. When the spec is clean, open `.qa/sections/<id>-diff.png` once: red = differs from Figma. Look for what numbers miss — missing or extra elements, order, image crop, alignment, icons, decor. **Doubled outlines (two hearts, two arrows) = a shifted element** → add it to the spec and fix the position. Open `design/<id>.png` only if the diff is unclear.
-4. Ignore thin red outlines around glyphs (font rendering), pixel diff ≤ ~3% with a clean spec, and anything under 2 px. When the % grows between runs, read the diff image before explaining it — never guess a cause.
-5. Anti-oscillation: never undo a fix unless the next measurement got worse. If the same property flips twice, stop and report it.
-6. After 3 iterations, stop and list what still differs and why (missing font, longer copy, image crop).
+3. Fix every `texts` line (`"Jobs" is off by x +70 px`) the same way — find which container is off, don't move single texts.
+4. When spec and texts are clean, **always** open `.qa/sections/<id>-diff.png` (a low % proves nothing: a dark, sparse section hid a 70 px shift at 3%). Red = differs from Figma. Go through the `red zones` the checker lists and name each one: font rendering (thin outline of the same glyphs), a fixed typo (only those words), or a real difference — missing or extra element, order, image crop, white box around a photo (blend mode), alignment, icons, decor. **A word or shape drawn twice = a shifted element** → add it to the spec and fix the position. Open `design/<id>.png` only if the diff is unclear.
+5. Pixel diff > 10% is reported as an issue by the checker — the section is not done until every red zone is explained and the real ones are fixed. Never write "expected" for a zone you haven't looked at; when the % grows between runs, read the diff image before explaining it.
+6. Ignore thin red outlines around glyphs and anything under 2 px.
+7. Anti-oscillation: never undo a fix unless the next measurement got worse. If the same property flips twice, stop and report it.
+8. After 3 iterations, stop and list what still differs and why (missing font, longer copy, image crop).
 
 ## 7. Verify all widths and the page (max 2 rounds)
 1. `node scripts/section-check.mjs <id>` — 360, 768, 1024, 1280, 1440, 1920, 2560.
@@ -127,8 +137,9 @@ Read `references/figma-mapping.md` and `references/breakpoints.md` first.
 ## 8. Finish
 - `pnpm lint`, then `pnpm typecheck`; fix until both pass.
 - **Shared changes:** if this run changed `app/globals.css`, `app/layout.tsx` or a component used by other sections, re-run `section-check` for every ✅ section that uses it, and `--page`.
-- Status table: section → ✅; Notes = spec count, pixel diff, known differences, placeholders.
-- Propose the commit (`feat(<id>): build section from Figma`) with the file list — including `public/images/<id>/` and `design/<id>.spec.json`. Commit only after the user says yes.
+- Status table: section → ✅; Notes = spec + texts count, pixel diff with what the red zones are, known differences, placeholders.
+- **Commit = everything this section touched.** Run `git status`: every file this run changed or created must be in the list (component, `content/site.ts`, `app/page.tsx` / `app/layout.tsx` for fonts or placement, `app/globals.css`, `design/<id>.spec.json`, `design/page.json`, `public/images/<id>/`, `CLAUDE.md`). Ignored files (`design/*.png`, `.qa/`) stay out — never `git add -f`. (Coffea: a Testimonials commit missed the font in `layout.tsx` and the data in `site.ts` — it didn't build on its own.)
+- Propose the commit (`feat(<id>): build section from Figma`) with the file list. Commit only after the user says yes. After the commit `git status` must show nothing from this section.
 
 ## Image budget per section
 `design/<id>.png` (0–1) · `<id>-diff.png` (1–2) · `<id>-360.png` (1) · flagged widths (0–2). Never re-read `get_node` output — the spec file is the memory.
@@ -138,7 +149,8 @@ One section per session: after the commit, tell the user to run `/clear` before 
 
 ## Report (Ukrainian, max 10 lines)
 ```
-<Section> ✅ — spec 14/14 · pixel diff 2.1% · 7 widths OK · page OK
+<Section> ✅ — spec 14/14 · texts 20/20 · pixel diff 2.1% · 7 widths OK · page OK
+Red zones: <each zone → what it is (typo fix / font rendering / …)>
 Fixed: <short list>
 Left: <none | differences and why>
 Placeholders: <none | fields with // PLACEHOLDER>

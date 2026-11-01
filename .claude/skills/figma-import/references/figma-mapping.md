@@ -80,9 +80,13 @@ Figma can trim a text box from the cap height of the first line to the baseline 
 | `strokeAlign: OUTSIDE` | `ring-*` or `outline` |
 | `cornerRadius` / `cornerRadii` | radius token / `rounded-tl-* …` |
 | `opacity` (node) | `opacity-*` |
-| `clipsContent: true` | `overflow-hidden` on media/decor containers (`overflow-clip` on sections) — never to hide text that doesn't fit |
+| `blendMode: MULTIPLY` (image on a light background) | `mix-blend-multiply` — white becomes the background color. Typical: a JPG with a white background laid over a colored section (Coffea Promo, Newsletter). Without it the page shows white boxes around the picture. If `blendMode` isn't in the response: an exported image has a white background but the reference shows none → it is multiply |
+| `clipsContent: true` | `overflow-hidden` on media/decor containers; on sections `overflow-x-clip` (never `overflow-hidden` — it cuts focus rings and shadows); never to hide text that doesn't fit |
 | `rotation` | `rotate-*` (mostly decor) |
 | `constraints` | only for absolute children: MIN = left/top, MAX = right/bottom, CENTER, STRETCH = inset-x-0, SCALE = % |
+
+## Forms (UI only — logic is a separate task)
+`<form>` · `<input type="email" name="email">` (or the right type) with a `<label>` — visible if the design has one, otherwise `sr-only` · `<button type="submit">` · inputs `text-base` (16 px, no iOS zoom) · below `md:` input and button stacked, both `w-full`, `min-h-11` · placeholder text from the design.
 
 ## Components (by layer / component names)
 Button → shadcn `Button` (variants via cva) · FAQ / accordion → `Accordion` · inputs → `Input`, `Textarea`, `Label` · mobile menu → `Sheet` · tabs → `Tabs` · modal → `Dialog`.
@@ -91,6 +95,8 @@ Prefer these over hand-made menus, accordions and modals. `shadcn init` already 
 ## Assets
 - small vector icons (16–32 px, `VECTOR` / icon component) → `lucide-react` icon **by the Figma layer name** (`arrow-right` → `ArrowRight`, `mdi:heart-outline` → `Heart`, not a look-alike chevron); brand/custom icons → SVG export.
 - logos, illustrations made of vectors → SVG; photos and raster art → JPG `scale: 2`.
+- cut-outs (a picture with a transparent background) → PNG `scale: 2` (JPG turns transparency into white). A cut-out look made with a white background + multiply → JPG + `mix-blend-multiply` (Paint table).
+- the same picture on both sides (decor): reuse one file with `scale-x-[-1]` only if Figma shows the same image flipped; a different picture or a different crop → export each node.
 - full-bleed background images → JPG `scale: 2` (needed for 2560 px screens).
 - alt text: look at the image and describe it (`"Latte with heart art on a wooden table"`); decorative → `alt=""`. Never a placeholder marker in `alt`.
 - an asset re-exported in another format (JPG → PNG for transparency) → delete the old file; no unused files in `public/images/<id>/`.
@@ -110,4 +116,5 @@ Prefer these over hand-made menus, accordions and modals. `shadcn init` already 
 - `x`/`y`: sum `bounds.x/y` of the node and its parents up to the section.
 - `gap`: `autoLayout.gap`; `rowGap` = `counterAxisSpacing` for wrapped rows.
 - `h` on text with 2+ lines: the text node's `bounds.height` (lets the checker spot Vertical trim). `h` on cards and sections is diagnostic — it tells you something inside is off, it is never a reason for `h-*`.
-- Absolutely positioned icons/badges/controls: `x y w h` from bounds (summed up to the section).
+- Absolutely positioned icons/badges/controls/decor images: `x y w h` from bounds (summed up to the section).
+- `texts` (text map): for every TEXT node `characters`, `x`/`y` summed up to the section frame, `w` = `bounds.width`, `align` = `textAlignHorizontal`. Keep `characters` exactly as in Figma, typos included — the checker matches by similarity.
