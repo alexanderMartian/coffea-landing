@@ -12,5 +12,12 @@
     "coffee-menu-card-price": { "fontSize": 20, "fontWeight": 600, "fontFamily": "Poppins", "color": "#2a0000" },
     "coffee-menu-card-btn":   { "h": 41, "radius": 8, "bg": "#2a0000", "color": "#ffffff", "fontSize": 14 },
     "coffee-menu-card-heart": { "x": 432, "y": 141, "w": 33, "h": 33 }
-  }
+  },
+  "texts": [
+    { "text": "our special coffee", "x": 699, "y": 0, "w": 361, "align": "LEFT" },
+    { "text": "Lungo coffee", "x": 158, "y": 503, "w": 221, "align": "LEFT" },
+    { "text": "Lorem ipsum dolor sit amet, consectetur adipisicing elit,", "x": 158, "y": 561, "w": 334, "align": "LEFT" },
+    { "text": "Rs. 200", "x": 158, "y": 626, "w": 72, "align": "LEFT" },
+    { "text": "Order Now", "x": 391, "y": 630, "w": 75, "align": "LEFT" }
+  ]
 }

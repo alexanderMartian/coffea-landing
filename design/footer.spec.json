@@ -12,5 +12,25 @@
     "footer-privacy-link": { "x": 459, "y": 152, "fontSize": 18, "fontFamily": "Poppins", "fontWeight": 400, "color": "#ffffff" },
     "footer-social-heading": { "x": 1507, "y": 98, "fontSize": 24, "fontFamily": "Playfair Display", "fontWeight": 700, "color": "#ffffff", "_note": "uppercase in design" },
     "footer-social-icon": { "x": 1529, "y": 165, "w": 24, "h": 24 }
-  }
+  },
+  "texts": [
+    { "text": "Coffee", "x": 238, "y": 80, "w": 116, "align": "LEFT" },
+    { "text": "PRIVACY", "x": 459, "y": 96, "w": 99, "align": "LEFT" },
+    { "text": "Terms of use", "x": 459, "y": 152, "w": 115, "align": "LEFT" },
+    { "text": "Privacy policy", "x": 459, "y": 194, "w": 124, "align": "LEFT" },
+    { "text": "Cookies", "x": 459, "y": 236, "w": 72, "align": "LEFT" },
+    { "text": "SERVICES", "x": 698, "y": 96, "w": 112, "align": "LEFT" },
+    { "text": "Shop", "x": 698, "y": 152, "w": 46, "align": "LEFT" },
+    { "text": "Order ahead", "x": 698, "y": 194, "w": 115, "align": "LEFT" },
+    { "text": "Menu", "x": 698, "y": 236, "w": 50, "align": "LEFT" },
+    { "text": "ABOUT US", "x": 928, "y": 96, "w": 115, "align": "LEFT" },
+    { "text": "Find a location", "x": 928, "y": 152, "w": 132, "align": "LEFT" },
+    { "text": "About us", "x": 928, "y": 194, "w": 80, "align": "LEFT" },
+    { "text": "Out story", "x": 928, "y": 236, "w": 82, "align": "LEFT" },
+    { "text": "INFOTNATION", "x": 1175, "y": 96, "w": 163, "align": "LEFT" },
+    { "text": "Plons & pricing", "x": 1175, "y": 152, "w": 133, "align": "LEFT" },
+    { "text": "Sell your prodcts", "x": 1175, "y": 194, "w": 150, "align": "LEFT" },
+    { "text": "Jobs", "x": 1175, "y": 236, "w": 43, "align": "LEFT" },
+    { "text": "SOCIAL MEDIA", "x": 1507, "y": 98, "w": 176, "align": "LEFT" }
+  ]
 }
