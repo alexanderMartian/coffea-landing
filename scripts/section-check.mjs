@@ -294,11 +294,21 @@ async function checkTexts(page, texts) {
         const own = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(" ");
         const range = document.createRange(); range.selectNodeContents(el);
         const rr = range.getBoundingClientRect(), er = el.getBoundingClientRect();
-        const inline = getComputedStyle(el).display.startsWith("inline");
+        const s = getComputedStyle(el);
+        // Top of the text's first line box = what Figma calls the text node's y. The element box is not it:
+        // a button or a link with padding / flex centering has its text lower than its own top.
+        let top;
+        if (/trim/.test(s.textBoxTrim || "") && !/none/.test(s.textBoxTrim || "")) {
+          top = er.top + parseFloat(s.borderTopWidth) + parseFloat(s.paddingTop); // trimmed box = Figma's trimmed box
+        } else {
+          const first = range.getClientRects()[0] || rr;
+          const lh = parseFloat(s.lineHeight);
+          top = Number.isFinite(lh) ? first.top - (lh - first.height) / 2 : first.top;
+        }
         return {
           el, label: window.__label(el), t: norm(el.textContent || own),
           left: rr.left - sr.left - fx, right: rr.right - sr.left - fx,
-          top: (inline ? rr.top : er.top) - sr.top - fy,
+          top: top - sr.top - fy,
         };
       });
       const used = new Set();
