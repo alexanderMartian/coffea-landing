@@ -63,7 +63,9 @@ export default function RevealObserver() {
           io.unobserve(entry.target);
         }
       },
-      { rootMargin: "0px 0px -10% 0px" },
+      // 10% of the element visible. Not a negative bottom rootMargin: an element at the very end of the page could
+      // never reach that zone and would stay invisible.
+      { threshold: 0.1 },
     );
     for (const el of document.querySelectorAll<HTMLElement>("[data-reveal]")) {
       if (el.dataset.reveal === "shown") continue; // already revealed (e.g. footer in the layout)
@@ -95,7 +97,10 @@ Use in sections (Server Components):
 - Never on Header, Hero or anything in the first viewport. Never on `<section>` itself if the section has a
   background — reveal its content, so the background doesn't flash.
 - Stagger is capped at 6 items (`min(…, 6)`), so long lists don't wait seconds for the last card.
-- Horizontal carousels: reveal the row once, not each card (cards 5+ are off-screen sideways).
+- Horizontal carousels: reveal the row once, not each card (cards 5+ are off-screen sideways), with `data-reveal`
+  on a wrapper `<div>` around the scroll container.
+- Images with `mix-blend-*` (and their ancestors): no reveal, no zoom — see section 7.
+- Decorative, absolutely positioned images: fade only — `style={{ "--reveal-distance": "0px" }}`.
 
 ## 3. Smooth scrolling to anchors
 ```tsx
@@ -179,6 +184,11 @@ import * as m from "motion/react-m";
   so a fade-in moves LCP to the end of the animation or later.
 - Animate `width`, `height`, `top`, `left`, `margin`, `padding`, `font-size` — layout every frame, jank and CLS.
   Use `transform`/`translate`/`scale`/`opacity`.
+- Animate an image with `mix-blend-multiply` (or any element above it in the tree): `opacity < 1`, `translate`,
+  `scale`, `filter`, `clip-path` create a new stacking context, the image then blends with transparency instead of the
+  section background, and its white background flashes as a box. Fix the asset instead: a real cut-out, or the
+  multiply baked into an alpha PNG for that flat background colour.
+- Animate hover lift on a card that is not clickable — lift means "click me". Image zoom is enough.
 - `transition-all`, `will-change` everywhere (only for a proven problem), animating `box-shadow`/`filter: blur` on
   large areas.
 - Auto-playing loops longer than 5 s without a pause control (WCAG 2.2.2); auto-advancing carousels.

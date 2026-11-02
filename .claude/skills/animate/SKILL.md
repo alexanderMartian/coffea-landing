@@ -57,10 +57,12 @@ One table, then stop and wait:
 The **standard package** (default — propose it unless the design asks for more):
 1. Motion tokens in `globals.css`.
 2. Reveal on scroll: heading block of every section below the first screen; card grids with stagger (≤ 6);
-   carousel rows revealed once as a whole; large images in content sections.
+   carousel rows revealed once as a whole; large images in content sections (never images with `mix-blend-*` —
+   recipes section 7). Footer usually not: the end of the page, nobody notices.
 3. Smooth scrolling to anchors (`motion-safe:scroll-smooth`), `scroll-mt-*` if the header is sticky/fixed.
-4. Hover/press: buttons and links — colour transition; clickable cards — lift + shadow layer; card images — zoom
-   inside an `overflow-hidden` frame. Touch screens are already excluded by Tailwind v4 (`@media (hover: hover)`).
+4. Hover/press: buttons and links — colour transition (an existing `transition-colors` already is 150 ms +
+   the standard curve = our tokens — leave it, don't rewrite classes for nothing); clickable cards only — lift +
+   shadow layer; card images — zoom inside an `overflow-hidden` frame. Touch screens are already excluded by Tailwind v4 (`@media (hover: hover)`).
 5. Reduced motion handled by the CSS and the observer — nothing else to add.
 
 Anything outside the package (parallax, scroll progress bar, counters, marquee, page transitions, Motion) → list it
@@ -92,7 +94,10 @@ From `references/recipes.md`:
    - `node scripts/section-check.mjs --page` → same result as before (it uses reduced motion = final state).
 3. Production: ask the user to restart `pnpm prod` (port 3001), then
    `node scripts/lighthouse-summary.mjs --runs 3`. Compare with "before": CLS must stay ≤ 0.01, Performance within
-   the noise (−2 points at most), LCP not later.
+   the noise (−2 points at most), LCP not later. If it looks worse, don't guess — A/B on the same machine: `git stash -u`
+   → user restarts `pnpm prod` → `--runs 5`; `git stash pop` → restart → `--runs 5`; the user keeps the computer idle
+   and stops `pnpm dev` during runs (Coffea: 83 looked like a regression, A/B showed 87 vs 87 — machine load).
+   The checks (`visual-check`, `section-check --base http://localhost:3001`) can run on the same production server.
 4. Ask the user to check by eye: scroll the page at 360 and 1440; then turn on reduced motion (Windows: Settings →
    Accessibility → Visual effects → Animation effects off, or DevTools → Rendering → Emulate CSS
    prefers-reduced-motion) and reload — nothing moves, everything is visible, anchors jump instantly.

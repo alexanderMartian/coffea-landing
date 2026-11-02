@@ -80,7 +80,7 @@ Figma can trim a text box from the cap height of the first line to the baseline 
 | `strokeAlign: OUTSIDE` | `ring-*` or `outline` |
 | `cornerRadius` / `cornerRadii` | radius token / `rounded-tl-* …` |
 | `opacity` (node) | `opacity-*` |
-| `blendMode: MULTIPLY` (image on a light background) | `mix-blend-multiply` — white becomes the background color. Typical: a JPG with a white background laid over a colored section (Coffea Promo, Newsletter). Without it the page shows white boxes around the picture. If `blendMode` isn't in the response: an exported image has a white background but the reference shows none → it is multiply |
+| `blendMode: MULTIPLY` (image on a light background) | `mix-blend-multiply` — white becomes the background color. Typical: a JPG with a white background laid over a colored section (Coffea Promo, Newsletter). Without it the page shows white boxes around the picture. If `blendMode` isn't in the response: an exported image has a white background but the reference shows none → it is multiply. Such an image can't be animated later (opacity/transform on it or a parent isolates the blend → a white box flashes): if the user plans animations on it, ask for a cut-out, or bake the multiply into an alpha PNG for the flat section colour (colour-to-alpha + tint; tied to that colour) |
 | `clipsContent: true` | `overflow-hidden` on media/decor containers; on sections `overflow-x-clip` (never `overflow-hidden` — it cuts focus rings and shadows); never to hide text that doesn't fit |
 | `rotation` | `rotate-*` (mostly decor) |
 | `constraints` | only for absolute children: MIN = left/top, MAX = right/bottom, CENTER, STRETCH = inset-x-0, SCALE = % |
