@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Outfit, Poppins, Reggae_One } from "next/font/google";
+import { Playfair_Display, Outfit, Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
@@ -20,15 +21,19 @@ const outfit = Outfit({
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
+  preload: false,
 });
 
-const reggae = Reggae_One({
+// Latin slice only: the Google CSS ships ~120 Japanese @font-face rules we never use.
+// License: app/fonts/OFL.txt
+const reggae = localFont({
+  src: "./fonts/reggae-one-latin.woff2",
   variable: "--font-reggae-var",
-  subsets: ["latin"],
   weight: "400",
   display: "swap",
+  preload: false,
 });
 
 const TITLE = "Coffea — The richest coffee in the city";

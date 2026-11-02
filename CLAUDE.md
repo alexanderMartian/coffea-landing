@@ -14,12 +14,13 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
 - Phase: qa   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
+- Lighthouse (production, 2026-11-02): mobile 89 (lab, median of 3), desktop 99, a11y/BP/SEO 100
 
 | # | Section | id | Figma node | Status | Notes |
 |---|---|---|---|---|---|
 | 0 | Header | `header` | `2013:2` | ✅ | Nav bar, floats over Hero; in app/layout.tsx; pixel diff n/a (transparent bg) |
 | 1 | Hero | `hero` | `2013:3` | ✅ | font diff ~3.6% (Playfair rendering) |
-| 2 | Categories | `categories` | `2013:4` | ✅ | Outfit → Poppins (sans font); pixel diff 1.8% |
+| 2 | Categories | `categories` | `2013:4` | ✅ | Poppins via font-alt (Outfit stays font-sans); pixel diff 1.8% |
 | 3 | Coffee Menu | `coffee-menu` | `2013:5` | ✅ | ProductCard + ProductSection + CarouselRow; spec 34/34; pixel diff 3.9%; heart pos fixed |
 | 4 | Dessert Menu | `dessert-menu` | `2013:6` | ✅ | Shared card component with Coffee Menu; spec 34/34; pixel diff 3.2%; heart pos fixed |
 | 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 3.9% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |

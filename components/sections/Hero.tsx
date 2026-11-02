@@ -12,7 +12,8 @@ export default function Hero() {
         src="/images/hero/hero-bg.jpg"
         alt={site.hero.imageAlt}
         fill
-        priority
+        loading="eager"
+        fetchPriority="high"
         className="object-cover"
         sizes="100vw"
       />
