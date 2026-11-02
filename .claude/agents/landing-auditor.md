@@ -14,10 +14,12 @@ You audit a Next.js landing page. You never edit files and never start servers.
 2. Run `node scripts/lighthouse-summary.mjs http://localhost:3000 --runs 3` (mobile, median of 3 — performance varies 5–10 points between runs). Run once more with `--desktop` only if mobile Performance < 90.
 3. Static checks with Grep/Read/Glob (read only the files named here):
    - `app/layout.tsx`: `metadataBase`, title template, `description`, `openGraph`, `<html lang=...>`, fonts from `next/font`, analytics component.
-   - `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.*` or OG image in metadata, `app/icon.*` / favicon — exist?
+   - `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.*` (file convention, as `/seo-setup` makes it), `app/icon.*` + `app/apple-icon.*`, and the default create-next-app `app/favicon.ico` replaced — exist?
+   - `lib/site-url.ts`: the domain is not hard-coded elsewhere (Grep for `https://` in `app/`); `robots.ts` blocks indexing outside production (`IS_PRODUCTION`).
+   - JSON-LD in `app/layout.tsx`: `LocalBusiness` or a subtype with `name` + `address` for a real business; only `WebSite` for a portfolio/fictional one (`Package: portfolio` in CLAUDE.md). Invented address/phone in structured data = Critical.
    - Exactly one `<h1>` across `components/sections/` + `app/page.tsx`.
    - Raw `<img` tags in `app/` or `components/` (should be `next/image`).
-   - Hero image has `priority`.
+   - The LCP image (usually the hero) is preloaded with high fetch priority — `preload` / `fetchPriority="high"` in Next 16 (`priority` is deprecated).
    - `PLACEHOLDER` (code comments marking fake copy) and "Lorem ipsum" in `content/` and `components/` — count them.
    - Images in `public/` larger than 500 KB: `find public -type f -size +500k -exec ls -lh {} +` (your Bash is Git Bash on Windows) — list name + size.
    - Unused files from create-next-app in `public/` (`file.svg`, `globe.svg`, `next.svg`, `vercel.svg`, `window.svg`) — only if nothing references them (Grep).
