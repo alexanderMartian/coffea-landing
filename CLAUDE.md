@@ -62,9 +62,9 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - No fixed heights on text, cards or sections: no `h-*`, no `max-h-*` + `overflow-hidden` on text. Height comes from content; sections use `min-h-*`; text width via `max-w-*`. Fixed sizes only for icons, avatars, dots.
 - Spacing between sections: `mt-section-*` utilities (from `design/page.json`), set on the section in `app/page.tsx`; sections accept `className`.
 - Colors, radii, fonts come from theme tokens — no raw hex values in components. Merge classes with `cn()`.
-- Images: always `next/image` with `width`/`height` or `fill` + `sizes`. `priority` only on the hero (LCP) image.
+- Images: always `next/image` with `width`/`height` or `fill` + `sizes`. Only the hero (LCP) image gets `loading="eager"` + `fetchPriority="high"` (`priority` is deprecated in Next 16).
 - Fonts: `next/font`, families as in the design, `display: "swap"`. An extra family gets its own token/utility; never swap `--font-sans` for one section.
-- Animations: Motion only for enter/scroll reveals and small hovers; wrap the app in `<MotionConfig reducedMotion="user">`. Never animate layout-shifting properties on load.
+- Animations: added at the end with `/animate` — CSS first (tokens in `globals.css`, `data-reveal` + one `RevealObserver`, hover via Tailwind classes), the Motion library only for what CSS can't do (exit, layout, drag). Never animate the first screen on load; only transform/opacity; everything respects `prefers-reduced-motion`. Don't add animations while building sections.
 - Forms: one Zod schema in `lib/schemas.ts` → `zodResolver` on the client AND `safeParse` in the route handler. Add a honeypot field. Return `{ ok: boolean, error?: string }`.
 - Secrets only in env vars (`RESEND_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `CONTACT_TO_EMAIL`). Never `NEXT_PUBLIC_` for secrets. Keep `.env.example` updated.
 - SEO: `metadata` in `app/layout.tsx` with `metadataBase`, title template, description, `openGraph`; `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.(png|tsx)`. Exactly one `<h1>` per page; `<html lang>` set.

@@ -10,6 +10,12 @@
 // Once per page: in-page anchor links (#id) that point nowhere, href="#" placeholders (info), mobile menu
 // (360: open → links visible → link closes it; Escape closes it), keyboard walk with Tab (1440: visible focus on
 // every stop, no focus on hidden elements).
+// Motion (every width): first-screen elements that fade in or move on load (delays LCP — the first screen must not
+// animate), animations of layout properties (width/height/top/margin… — jank and CLS), elements still invisible after
+// scrolling (stuck reveal); info: infinite animations (WCAG 2.2.2), animations over 1 s, `transition: all`.
+// Once per page at 1440 with prefers-reduced-motion: reduce — nothing may move (transform/translate/scale/rotate),
+// nothing may stay hidden, no smooth scrolling. Detects CSS transitions/animations and the Web Animations API
+// (JS libraries that write styles every frame are caught only by the first-screen check).
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -61,8 +67,166 @@ const hits = {}; // issue -> widths (same problem at several widths is printed o
 const NOISE = [/_next\/webpack-hmr/, /__nextjs/, /_next\/static\/webpack\//, /\/__webpack_hmr/, /favicon\.ico$/, /[?&]_rsc=/];
 const isNoise = (url, err = "") => NOISE.some((r) => r.test(url)) || /ERR_ABORTED/.test(err);
 
-async function openPage(width, path, problems) {
-  const page = await browser.newPage({ viewport: { width, height: 900 } });
+// ---------- motion recorder (injected before the page's own scripts) ----------
+// 1) First 2.5 s after load: samples first-screen elements every 40 ms — effective opacity (own × ancestors) and
+//    effective transform. Faded in = was < 0.1, ends > 0.9. Moved = the transform changed.
+// 2) Whole lifetime: every running animation (document.getAnimations(): CSS transitions, CSS animations, WAAPI) with
+//    its properties and the phase it started in (load / scroll / interact — set from Node).
+const MOTION_RECORDER = () => {
+  if (window !== window.top) return;
+  const M = (window.__motion = { phase: "load", log: [], first: [], done: false });
+  const label = (el) => {
+    let s = el.tagName.toLowerCase();
+    if (el.id) s += `#${el.id}`;
+    const aria = el.getAttribute?.("aria-label");
+    if (aria) s += `[${aria}]`;
+    const text = (el.innerText || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 28);
+    return text ? `${s} "${text}"` : s;
+  };
+  const kebab = (p) => p.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+  const seen = new WeakSet();
+  const pollAnimations = () => {
+    for (const a of document.getAnimations()) {
+      if (seen.has(a)) continue;
+      seen.add(a);
+      const target = a.effect?.target;
+      if (!target || !(target instanceof Element)) continue;
+      let props = [];
+      if (a.transitionProperty) props = [a.transitionProperty];
+      else {
+        try {
+          props = [...new Set(a.effect.getKeyframes().flatMap((k) => Object.keys(k)))]
+            .filter((k) => !["offset", "computedOffset", "easing", "composite"].includes(k)).map(kebab);
+        } catch { /* ignore */ }
+      }
+      const t = a.effect.getComputedTiming?.() || {};
+      const scrollLinked = !!a.timeline && !(a.timeline instanceof DocumentTimeline);
+      M.log.push({
+        target, label: label(target), props, phase: M.phase, scrollLinked,
+        infinite: t.iterations === Infinity, duration: typeof t.duration === "number" ? t.duration : 0,
+        interactive: !!target.closest("[data-state]"),
+      });
+    }
+  };
+  setInterval(pollAnimations, 30);
+
+  // ---- first screen ----
+  const SEL = "h1,h2,h3,h4,p,img,picture,video,svg,a,button,li,blockquote,[data-reveal],[style*=opacity],[style*=transform]";
+  const track = new Map(); // el -> { min, sigs:Set, last }
+  const norm = (s) => {
+    const parts = [];
+    if (s.transform !== "none" && s.transform !== "matrix(1, 0, 0, 1, 0, 0)") parts.push(s.transform);
+    if (s.translate !== "none" && !/^0px( 0px)?( 0px)?$/.test(s.translate)) parts.push(`t:${s.translate}`);
+    if (s.scale !== "none" && s.scale !== "1") parts.push(`s:${s.scale}`);
+    if (s.rotate !== "none" && s.rotate !== "0deg") parts.push(`r:${s.rotate}`);
+    return parts.join(" ");
+  };
+  const sample = () => {
+    if (!document.body) return;
+    const memoO = new Map(), memoT = new Map();
+    const effO = (el) => {
+      if (!el || el === document.documentElement) return 1;
+      if (memoO.has(el)) return memoO.get(el);
+      const v = Number(getComputedStyle(el).opacity) * effO(el.parentElement);
+      memoO.set(el, v);
+      return v;
+    };
+    const effT = (el) => {
+      if (!el || el === document.documentElement) return "";
+      if (memoT.has(el)) return memoT.get(el);
+      const v = `${effT(el.parentElement)}|${norm(getComputedStyle(el))}`;
+      memoT.set(el, v);
+      return v;
+    };
+    const vh = window.innerHeight;
+    for (const el of document.body.querySelectorAll(SEL)) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 2 || r.height < 2 || r.bottom <= 0 || r.top >= vh) continue;
+      const o = effO(el), sig = effT(el);
+      const t = track.get(el) || { min: 1, sigs: new Set() };
+      t.min = Math.min(t.min, o);
+      t.sigs.add(sig);
+      t.last = { o, sig };
+      track.set(el, t);
+    }
+  };
+  const timer = setInterval(sample, 40);
+  const finish = () => {
+    clearInterval(timer);
+    sample();
+    pollAnimations();
+    const vh = window.innerHeight;
+    const loops = (el) => M.log.some((x) => x.infinite && (x.target === el || x.target.contains(el)));
+    const faded = [], moved = [];
+    for (const [el, t] of track) {
+      const r = el.getBoundingClientRect();
+      if (!el.isConnected || r.bottom <= 0 || r.top >= vh || loops(el)) continue;
+      if (t.min < 0.1 && t.last.o > 0.9) faded.push(el);
+      else if (t.sigs.size > 1) moved.push(el);
+    }
+    // Report the outermost element of each animated group.
+    const outer = (list) => list.filter((el) => !list.some((o) => o !== el && o.contains(el)));
+    M.first = [
+      ...outer(faded).map((el) => `fades in: ${label(el)}`),
+      ...outer(moved).map((el) => `moves: ${label(el)}`),
+    ];
+    M.done = true;
+  };
+  const start = () => setTimeout(finish, 2500);
+  if (document.readyState === "complete") start();
+  else window.addEventListener("load", start, { once: true });
+};
+
+const LAYOUT_PROP = /^(width|height|min-width|min-height|max-width|max-height|top|left|right|bottom|inset|margin|padding|font-size|line-height|letter-spacing|border(-[a-z]+)*-width|grid-template|gap|row-gap|column-gap)/;
+const MOVE_PROP = /^(transform|translate|scale|rotate|offset-)/;
+
+// Reads the motion log in Node-friendly form (phases load + scroll only, i.e. without user interaction).
+async function motionReport(page) {
+  return page.evaluate(({ layout, move }) => {
+    const L = new RegExp(layout), MV = new RegExp(move);
+    const M = window.__motion || { log: [], first: [] };
+    const passive = M.log.filter((x) => x.phase !== "interact");
+    const shown = (el) => { const r = el.getBoundingClientRect(); return el.isConnected && r.width > 0 && r.height > 0; };
+    const uniq = (arr) => [...new Set(arr)];
+    return {
+      first: M.first,
+      layout: uniq(passive.filter((x) => !x.interactive && x.props.some((p) => L.test(p)))
+        .map((x) => `${x.label} (${x.props.filter((p) => L.test(p)).join(", ")})`)),
+      moving: uniq(passive.filter((x) => x.props.some((p) => MV.test(p) || p === "all")).map((x) => `${x.label} (${x.props.join(", ")})`)),
+      infinite: uniq(passive.filter((x) => x.infinite && shown(x.target)).map((x) => x.label)),
+      slow: uniq(passive.filter((x) => !x.infinite && !x.scrollLinked && x.duration > 1000).map((x) => `${x.label} ${Math.round(x.duration)} ms`)),
+    };
+  }, { layout: LAYOUT_PROP.source, move: MOVE_PROP.source });
+}
+
+const setPhase = (page, phase) => page.evaluate((p) => { if (window.__motion) window.__motion.phase = p; }, phase);
+const motionDone = (page) => page.waitForFunction(() => window.__motion?.done, null, { timeout: 10000 }).catch(() => {});
+
+// Scroll through the page so lazy images, reveal-on-scroll and whileInView animations run, then wait for the last
+// (staggered) reveal to finish.
+async function scrollThrough(page) {
+  await page.evaluate(async () => {
+    const step = Math.max(400, Math.floor(window.innerHeight * 0.8));
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo({ top: y, behavior: "instant" });
+      await new Promise((r) => setTimeout(r, 120));
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
+  });
+  await page.waitForTimeout(1200);
+}
+
+const HIDDEN_BLOCKS = () => {
+  const effO = (el) => (!el || el === document.documentElement ? 1 : Number(getComputedStyle(el).opacity) * effO(el.parentElement));
+  return [...document.querySelectorAll("section, section > *, [data-reveal]")]
+    .filter((el) => el.getBoundingClientRect().height > 40 && effO(el) < 0.05)
+    .filter((el, _, all) => !all.some((o) => o !== el && o.contains(el)))
+    .slice(0, 3).map(window.__label);
+};
+
+async function openPage(width, path, problems, contextOptions = {}) {
+  const page = await browser.newPage({ viewport: { width, height: 900 }, ...contextOptions });
+  await page.addInitScript(MOTION_RECORDER);
   if (problems) {
     page.on("console", (m) => {
       if (m.type() !== "error") return;
@@ -85,7 +249,7 @@ const LABEL = () => {
     if (el.id) s += `#${el.id}`;
     const aria = el.getAttribute?.("aria-label");
     if (aria) s += `[${aria}]`;
-    const text = (el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 28);
+    const text = (el.innerText || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 28);
     return text ? `${s} "${text}"` : s;
   };
   window.__shown = (el) => {
@@ -197,17 +361,13 @@ for (const path of paths) {
       continue;
     }
 
-    // Scroll through the page so lazy images and whileInView animations run.
-    await page.evaluate(async () => {
-      const step = Math.max(400, Math.floor(window.innerHeight * 0.8));
-      for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
-        window.scrollTo(0, y);
-        await new Promise((r) => setTimeout(r, 120));
-      }
-      window.scrollTo(0, 0);
-    });
-    await page.waitForTimeout(600);
+    await motionDone(page); // first-screen sampling (2.5 s after load)
+    await setPhase(page, "scroll");
+    await scrollThrough(page);
     await page.evaluate(LABEL);
+    const hiddenBlocks = await page.evaluate(HIDDEN_BLOCKS);
+    const mo = await motionReport(page);
+    await setPhase(page, "interact");
 
     const r = await page.evaluate(() => {
       const vw = document.documentElement.clientWidth;
@@ -227,23 +387,33 @@ for (const path of paths) {
       const broken = imgs.filter((i) => i.complete && i.naturalWidth === 0).map((i) => (i.currentSrc || i.src).slice(0, 100));
       const noAlt = imgs.filter((i) => !i.hasAttribute("alt")).length;
       const h1 = document.querySelectorAll("h1").length;
-      const hiddenBlocks = [...document.querySelectorAll("section, section > *")]
-        .filter((el) => el.getBoundingClientRect().height > 40 && Number(getComputedStyle(el).opacity) < 0.05)
-        .slice(0, 3).map(window.__label);
+      const transitionAll = [...document.querySelectorAll("body *")].filter((el) => {
+        const s = getComputedStyle(el);
+        return s.transitionProperty.split(",").some((p) => p.trim() === "all") && s.transitionDuration.split(",").some((d) => parseFloat(d) > 0);
+      });
       const anchors = [...document.querySelectorAll('a[href^="#"]')].map((a) => a.getAttribute("href"));
       const deadAnchors = [...new Set(anchors.filter((h) => h.length > 1 && !document.getElementById(decodeURIComponent(h.slice(1)))))];
       const placeholders = anchors.filter((h) => h === "#").length;
-      return { overflowX, offenders: offenders.map(window.__label), broken, noAlt, h1, hiddenBlocks, deadAnchors, placeholders };
+      return {
+        overflowX, offenders: offenders.map(window.__label), broken, noAlt, h1, deadAnchors, placeholders,
+        transitionAll: { count: transitionAll.length, some: transitionAll.slice(0, 3).map(window.__label) },
+      };
     });
 
     if (r.overflowX) problems.push(`horizontal overflow; wider than viewport: ${r.offenders.join(" | ") || "unknown element"}`);
     if (r.broken.length) problems.push(`broken images: ${r.broken.join(", ")}`);
     if (r.noAlt) problems.push(`${r.noAlt} <img> without alt attribute`);
     if (r.h1 !== 1) problems.push(`${r.h1} <h1> elements (expected 1)`);
-    if (r.hiddenBlocks.length) problems.push(`invisible after scroll (opacity 0, stuck animation?): ${r.hiddenBlocks.join(" | ")}`);
+    if (hiddenBlocks.length) problems.push(`invisible after scroll (opacity 0, stuck reveal?): ${hiddenBlocks.join(" | ")}`);
+    // Motion
+    if (mo.first.length) problems.push(`motion: first screen animates on load (delays LCP — never animate the first screen): ${mo.first.slice(0, 3).join(" | ")}${mo.first.length > 3 ? ` … +${mo.first.length - 3}` : ""}`);
+    if (mo.layout.length) problems.push(`motion: animates layout properties (use transform/opacity): ${mo.layout.slice(0, 3).join(" | ")}`);
     if (!anchorsDone) {
       if (r.deadAnchors.length) problems.push(`anchor links to missing ids: ${r.deadAnchors.join(", ")}`);
       if (r.placeholders) info.push(`${r.placeholders} link(s) with href="#" (placeholders — real URLs before launch)`);
+      if (r.transitionAll.count) info.push(`motion: ${r.transitionAll.count} element(s) with transition: all — name the properties: ${r.transitionAll.some.join(" | ")}`);
+      if (mo.infinite.length) info.push(`motion: infinite animation (WCAG 2.2.2 — longer than 5 s needs a pause control): ${mo.infinite.slice(0, 3).join(" | ")}`);
+      if (mo.slow.length) info.push(`motion: animation longer than 1 s (feels slow): ${mo.slow.slice(0, 3).join(" | ")}`);
       anchorsDone = true;
     }
 
@@ -267,6 +437,27 @@ for (const path of paths) {
     console.log(`[${width}] ${path}: ${unique.length ? `${unique.length} issue(s)` : "OK"} → ${file}`);
     for (const i of info) console.log(`   · ${i}`);
   }
+
+  // ---------- prefers-reduced-motion: reduce ----------
+  const problems = [];
+  try {
+    const page = await openPage(KEYBOARD_WIDTH, path, null, { reducedMotion: "reduce" });
+    await motionDone(page);
+    await setPhase(page, "scroll");
+    await scrollThrough(page);
+    await page.evaluate(LABEL);
+    const hidden = await page.evaluate(HIDDEN_BLOCKS);
+    const mo = await motionReport(page);
+    const smooth = await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior === "smooth");
+    await page.close();
+    if (mo.moving.length) problems.push(`reduced motion: still moves (wrap in motion-safe: / @media (prefers-reduced-motion: no-preference)): ${mo.moving.slice(0, 3).join(" | ")}`);
+    if (hidden.length) problems.push(`reduced motion: invisible after scroll: ${hidden.join(" | ")}`);
+    if (smooth) problems.push("reduced motion: smooth scrolling is still on (use motion-safe:scroll-smooth)");
+  } catch (e) {
+    problems.push(`reduced motion: check failed (${e.message.split("\n")[0]})`);
+  }
+  for (const u of problems) (hits[`${path} ${u}`] ??= []).push(`${KEYBOARD_WIDTH} reduced`);
+  console.log(`[${KEYBOARD_WIDTH} reduced motion] ${path}: ${problems.length ? `${problems.length} issue(s)` : "OK"}`);
 }
 
 await browser.close();
