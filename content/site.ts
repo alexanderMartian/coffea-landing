@@ -4,13 +4,13 @@ export const site = {
   name: "Coffea",
   nav: {
     links: [
-      { label: "home", href: "#" },
+      { label: "home", href: "/" },
       { label: "coffee", href: "#coffee-menu" },
       { label: "bakery", href: "#dessert-menu" },
-      { label: "shop", href: "#" },
-      { label: "about", href: "#" },
+      { label: "shop", href: "#coffee-menu" },
+      { label: "about", href: "/" },
     ],
-    cta: { label: "login", href: "#" },
+    cta: { label: "login", href: "/" },
   },
   hero: {
     eyebrow: "Welcome",
@@ -292,27 +292,27 @@ export const site = {
       {
         heading: "PRIVACY",
         links: [
-          // TODO: replace # with real URLs
-          { label: "Terms of use", href: "#" },
-          { label: "Privacy policy", href: "#" },
-          { label: "Cookies", href: "#" },
+          // TODO: replace / with real URLs
+          { label: "Terms of use", href: "/" },
+          { label: "Privacy policy", href: "/" },
+          { label: "Cookies", href: "/" },
         ],
       },
       {
         heading: "SERVICES",
         links: [
-          { label: "Shop", href: "#" },
-          { label: "Order ahead", href: "#" },
+          { label: "Shop", href: "#coffee-menu" },
+          { label: "Order ahead", href: "#coffee-menu" },
           { label: "Menu", href: "#coffee-menu" },
         ],
       },
       {
         heading: "ABOUT US",
         links: [
-          { label: "Find a location", href: "#" },
-          { label: "About us", href: "#" },
+          { label: "Find a location", href: "/" },
+          { label: "About us", href: "/" },
           // Typo fixed: "Out story" → "Our story"
-          { label: "Our story", href: "#" },
+          { label: "Our story", href: "/" },
         ],
       },
       {
@@ -320,20 +320,20 @@ export const site = {
         heading: "INFORMATION",
         links: [
           // Typo fixed: "Plons & pricing" → "Plans & pricing"
-          { label: "Plans & pricing", href: "#" },
+          { label: "Plans & pricing", href: "#coffee-menu" },
           // Typo fixed: "Sell your prodcts" → "Sell your products"
-          { label: "Sell your products", href: "#" },
-          { label: "Jobs", href: "#" },
+          { label: "Sell your products", href: "/" },
+          { label: "Jobs", href: "/" },
         ],
       },
     ],
     social: {
       heading: "SOCIAL MEDIA",
       links: [
-        { label: "X", href: "#", icon: "/images/footer/icon-x.svg" },
-        { label: "Instagram", href: "#", icon: "/images/footer/icon-instagram.svg" },
-        { label: "Facebook", href: "#", icon: "/images/footer/icon-facebook.svg" },
-        { label: "LinkedIn", href: "#", icon: "/images/footer/icon-linkedin.svg" },
+        { label: "X", href: "/", icon: "/images/footer/icon-x.svg" },
+        { label: "Instagram", href: "/", icon: "/images/footer/icon-instagram.svg" },
+        { label: "Facebook", href: "/", icon: "/images/footer/icon-facebook.svg" },
+        { label: "LinkedIn", href: "/", icon: "/images/footer/icon-linkedin.svg" },
       ],
     },
   },
