@@ -7,7 +7,9 @@
       "Bash(node scripts/section-check.mjs *)",
       "Bash(node scripts/visual-check.mjs *)",
       "Bash(pnpm lint)",
-      "Bash(pnpm typecheck)"
+      "Bash(pnpm typecheck)",
+      "Bash(node scripts/lighthouse-summary.mjs *)",
+      "Bash(pnpm audit --prod)"
     ],
     "deny": [
       "mcp__figma-bridge__set_*",
