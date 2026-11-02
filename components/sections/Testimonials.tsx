@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import Reveal from "@/components/Reveal";
 import { site } from "@/content/site";
+import TestimonialsCarousel from "./TestimonialsCarousel";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -28,22 +30,24 @@ function StarRating({ rating }: { rating: number }) {
 type TestimonialItem = (typeof site.testimonials.items)[number];
 
 // Desktop visual order: active (DOM 0) → center (order-2); card1 (DOM 1) → left (order-1); card2 (DOM 2) → right (order-3)
+const CARDS_PER_PAGE = 3;
+
 const DESKTOP_ORDER_CLASS = ["lg:order-2", "lg:order-1", "lg:order-3"] as const;
 
 function TestimonialCard({
   item,
   domIndex,
   active,
+  spec,
 }: {
   item: TestimonialItem;
   domIndex: number;
   active?: boolean;
+  spec?: boolean;
 }) {
   return (
     <div
-      data-reveal
-      style={{ "--reveal-index": domIndex } as React.CSSProperties}
-      data-spec={active ? "testimonials-card-active" : undefined}
+      data-spec={spec ? "testimonials-card-active" : undefined}
       className={cn(
         "rounded-[18px] overflow-hidden bg-warm-surface/40",
         // Mobile/tablet: full-width stacked card
@@ -62,7 +66,7 @@ function TestimonialCard({
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <div
-            data-spec={active ? "testimonials-card-avatar" : undefined}
+            data-spec={spec ? "testimonials-card-avatar" : undefined}
             className="relative shrink-0 w-14 h-14 rounded-full overflow-hidden"
           >
             <Image
@@ -75,13 +79,13 @@ function TestimonialCard({
           </div>
           <div className="min-w-0">
             <p
-              data-spec={active ? "testimonials-card-name" : undefined}
+              data-spec={spec ? "testimonials-card-name" : undefined}
               className="font-alt font-semibold text-[18px] leading-[27px] text-foreground"
             >
               {item.name}
             </p>
             <p
-              data-spec={active ? "testimonials-card-role" : undefined}
+              data-spec={spec ? "testimonials-card-role" : undefined}
               className="font-alt font-semibold text-[14px] leading-[21px] text-foreground/70"
             >
               {item.role}
@@ -93,7 +97,7 @@ function TestimonialCard({
 
       {/* Review body */}
       <p
-        data-spec={active ? "testimonials-card-body" : undefined}
+        data-spec={spec ? "testimonials-card-body" : undefined}
         data-allow-small=""
         className="mt-[18px] font-alt font-medium text-[12px] leading-[20px] text-foreground [text-box:trim-both_cap_alphabetic]"
       >
@@ -106,12 +110,35 @@ function TestimonialCard({
 export default function Testimonials({ className }: { className?: string }) {
   const { testimonials } = site;
 
+  // Pages of 3: the first item of each page is the featured (centre) card
+  const pages = Array.from(
+    { length: Math.ceil(testimonials.items.length / CARDS_PER_PAGE) },
+    (_, p) => (
+      <div
+        key={p}
+        className="flex flex-col gap-4 lg:flex-row lg:gap-0 lg:items-center lg:justify-between"
+      >
+        {testimonials.items
+          .slice(p * CARDS_PER_PAGE, (p + 1) * CARDS_PER_PAGE)
+          .map((item, i) => (
+            <TestimonialCard
+              key={i}
+              item={item}
+              domIndex={i}
+              active={i === 0}
+              spec={p === 0 && i === 0}
+            />
+          ))}
+      </div>
+    )
+  );
+
   return (
     <section id="testimonials" className={cn("overflow-x-clip", className)}>
       <div className="mx-auto w-full max-w-content px-4 md:px-8 lg:px-12 3xl:px-0">
 
         {/* Heading: "Come and Join" + "our happy customers" */}
-        <div data-reveal className="flex flex-col items-center">
+        <Reveal className="flex flex-col items-center">
           <p
             data-spec="testimonials-heading-label"
             className="w-fit font-reggae text-h3 leading-[1.44] text-foreground"
@@ -124,28 +151,15 @@ export default function Testimonials({ className }: { className?: string }) {
           >
             {testimonials.heading}
           </h2>
-        </div>
+          <p className="mt-2 text-center text-sm text-foreground/70">
+            {testimonials.sampleNote}
+          </p>
+        </Reveal>
 
-        {/* Cards: vertical stack on mobile, 3-col flex on desktop */}
-        <div className="flex flex-col gap-4 mt-8 lg:flex-row lg:gap-0 lg:items-center lg:justify-between">
-          {testimonials.items.map((item, i) => (
-            <TestimonialCard key={i} item={item} domIndex={i} active={i === 0} />
-          ))}
-        </div>
-
-        {/* Pagination dots — visible only on desktop (decorative on mobile) */}
-        <div
-          data-spec="testimonials-dots"
-          className="hidden lg:flex w-fit mx-auto gap-2 mt-6"
-        >
-          <span
-            aria-current="true"
-            className="block w-3 h-3 rounded-full bg-foreground"
-          />
-          <span className="block w-3 h-3 rounded-full bg-foreground/50" />
-          <span className="block w-3 h-3 rounded-full bg-foreground/50" />
-        </div>
-
+        {/* Carousel is revealed once as a whole; pages 2–3 sit off-screen sideways */}
+        <Reveal className="mt-8">
+          <TestimonialsCarousel pages={pages} />
+        </Reveal>
       </div>
     </section>
   );

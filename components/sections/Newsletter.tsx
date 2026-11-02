@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Reveal from "@/components/Reveal";
 import { site } from "@/content/site";
 
 export default function Newsletter({ className }: { className?: string }) {
@@ -42,7 +43,7 @@ export default function Newsletter({ className }: { className?: string }) {
       </div>
 
       {/* Content */}
-      <div data-reveal className="relative z-10 flex flex-col items-center text-center px-4 3xl:px-0 w-full max-w-lg 3xl:max-w-[514px]">
+      <Reveal className="relative z-10 flex flex-col items-center text-center px-4 3xl:px-0 w-full max-w-lg 3xl:max-w-[514px]">
         <h2
           data-spec="newsletter-title"
           className="font-alt font-semibold text-xl leading-[1.5] md:text-2xl 3xl:text-[2rem] text-foreground"
@@ -86,7 +87,7 @@ export default function Newsletter({ className }: { className?: string }) {
             {site.newsletter.cta}
           </button>
         </form>
-      </div>
+      </Reveal>
     </section>
   );
 }

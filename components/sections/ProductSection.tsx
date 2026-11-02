@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Reveal from "@/components/Reveal";
 import CarouselRow from "./CarouselRow";
 import ProductCard from "./ProductCard";
 
@@ -23,21 +24,21 @@ export default function ProductSection({ id, title, items, className }: Props) {
   return (
     <section id={id} className={cn("overflow-x-clip", className)}>
       <div className="mx-auto w-full max-w-[110rem] px-4 md:px-8 3xl:px-0">
-        <h2
-          data-reveal
+        <Reveal
+          as="h2"
           data-spec={`${id}-heading`}
           className="font-display font-semibold text-h3 text-center tracking-[0.04em] uppercase text-foreground mb-16"
         >
           {title}
-        </h2>
+        </Reveal>
 
-        <div data-reveal>
+        <Reveal>
           <CarouselRow>
             {items.map((item, i) => (
               <ProductCard key={i} {...item} specPrefix={i === 0 ? id : ""} />
             ))}
           </CarouselRow>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

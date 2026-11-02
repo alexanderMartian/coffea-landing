@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Reveal from "@/components/Reveal";
 import { site } from "@/content/site";
 
 export default function Promo({ className }: { className?: string }) {
@@ -26,7 +27,7 @@ export default function Promo({ className }: { className?: string }) {
 
       {/* Content */}
       <div className="relative z-10 flex items-center min-h-[240px] md:min-h-[335px]">
-        <div data-reveal className="w-full px-6 py-10 md:py-0 text-center md:text-left md:pl-[31.67%] 3xl:pl-[608px] md:pr-6">
+        <Reveal className="w-full px-6 py-10 md:py-0 text-center md:text-left md:pl-[31.67%] 3xl:pl-[608px] md:pr-6">
           <h2
             data-spec="promo-heading"
             className="font-display font-semibold text-2xl leading-tight md:text-[2rem] 3xl:text-[2.5rem] 3xl:leading-[1.25] text-black max-w-xs md:max-w-[372px] mx-auto md:mx-0"
@@ -44,7 +45,7 @@ export default function Promo({ className }: { className?: string }) {
               <ChevronRight className="h-5 w-5 -ml-3" strokeWidth={2} />
             </span>
           </a>
-        </div>
+        </Reveal>
       </div>
 
       {/* Right decorative image — hidden on mobile */}
