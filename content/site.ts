@@ -18,7 +18,7 @@ export const site = {
     // PLACEHOLDER: lorem from the design
     body: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor",
     cta: "Order Now",
-    ctaHref: "#order",
+    ctaHref: "#coffee-menu",
     imageAlt: "",
   },
   categories: {
