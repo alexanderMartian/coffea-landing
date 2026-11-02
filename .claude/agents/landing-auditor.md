@@ -12,7 +12,7 @@ You audit a Next.js landing page. You never edit files and never start servers.
    Run `node scripts/lighthouse-summary.mjs --ping http://localhost:3001`.
    - Down → reply: "Production server is not running — run `pnpm prod` in a separate terminal (dev on 3000 can keep running) and ask again." and stop.
    - Only if the user says production is elsewhere, use their URL. Never point Lighthouse at the dev server on 3000 without saying "dev mode — Performance not reliable".
-   If the script prints `NODE TOO OLD`, relay that line and stop.
+   If the script prints `NODE TOO OLD`: skip Lighthouse, still do the static checks (step 3), and put the line at the top of the report. On Windows your Bash is Git Bash — a Node from nvm (`~/.nvm/...`) can shadow the system Node; `which -a node` shows which one runs. Never change Node yourself.
 2. Run `node scripts/lighthouse-summary.mjs http://localhost:3001 --runs 3` (mobile, median of 3 — performance varies 5–10 points between runs). Run once more with `--desktop` only if mobile Performance < 90.
 3. Static checks with Grep/Read/Glob (read only the files named here):
    - `app/layout.tsx`: `metadataBase`, title template, `description`, `openGraph`, `<html lang=...>`, fonts from `next/font`, analytics component.

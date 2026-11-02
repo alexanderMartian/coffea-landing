@@ -242,7 +242,7 @@ function compareSpec(specEls, measured) {
       const act = prop === "x" ? got.x - frameX : prop === "y" ? got.y - frameY : got[prop];
       let ok;
       if (prop === "color" || prop === "bg") ok = hexDist(String(exp).toLowerCase(), act) <= 3;
-      else if (prop === "fontFamily") ok = String(act).toLowerCase().includes(String(exp).toLowerCase());
+      else if (prop === "fontFamily") ok = sameFamily(act, exp);
       else if (prop === "fontWeight") ok = Number(exp) === act;
       else if (prop in TOL) ok = typeof act === "number" && Math.abs(act - Number(exp)) <= TOL[prop];
       else { checks--; continue; } // unknown prop: ignore
@@ -250,6 +250,16 @@ function compareSpec(specEls, measured) {
     }
   }
   return { checks, fails };
+}
+
+// Font family: Figma names the family ("Reggae One"); next/font names it after the variable — Google fonts keep the
+// real name ("'Playfair Display', 'Playfair Display Fallback'"), next/font/local uses the JS name ("reggae, 'reggae Fallback'").
+// Compare letters only and accept a computed name that is the start of the design name (reggae → reggaeone).
+function sameFamily(act, exp) {
+  const norm = (x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, "");
+  const want = norm(exp);
+  const names = String(act).split(",").map(norm).filter((n) => n && !n.endsWith("fallback"));
+  return names.some((n) => n === want || n.includes(want) || (n.length >= 4 && want.startsWith(n)));
 }
 
 // Figma "Vertical trim: Cap height to baseline" makes a text box shorter than lines × lineHeight:

@@ -11,11 +11,11 @@ visitor uses it.
 
 ## Steps
 1. `node scripts/visual-check.mjs --ping`. If the server is down, reply exactly: "Dev server is not running on http://localhost:3000 — start `pnpm dev` and ask again." and stop.
-2. `node scripts/visual-check.mjs http://localhost:3000 <paths>` (default `/`; add the paths you were given).
+2. `node scripts/visual-check.mjs http://localhost:3000` — the home page is the default; add other paths only if you were given them (`/privacy`). Don't pass `/` and don't set `MSYS_NO_PATHCONV` — the script handles Git Bash paths itself.
    The script already tests: console / page errors, failed requests and HTTP ≥ 400 (dev noise filtered), broken
    images, missing alt, `<h1>` count, horizontal overflow, blocks stuck at opacity 0, anchor links to missing ids,
    the mobile menu at 360 (opens, has links, Escape and a link close it), Tab through the page at 1440 (visible focus,
-   no focus on hidden elements). Trust its numbers; don't re-check them by eye.
+   no focus on hidden elements). Trust its numbers; don't re-check them by eye. If a script result looks impossible (e.g. a menu "without links" while the code clearly has them), say so and name it as a possible checker issue — don't send the developer to fix working code.
 3. Look at screenshots in `.qa/screenshots/` — at most 4 images: always `<page>-360.png`, plus `<page>-1440.png`,
    plus any width the script flagged. Look only for what code can't measure: text unreadable over a photo, a CTA
    lost or pushed far down on mobile, awkward empty gaps or crowding between sections, images cropped so the subject

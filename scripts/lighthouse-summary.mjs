@@ -3,7 +3,7 @@
 // top performance insights by estimated savings, and the top failing audits of the other categories.
 // Built for Lighthouse 13 (performance "insights" have weight 0, so they are read separately).
 //
-// Usage: node scripts/lighthouse-summary.mjs [url] [--desktop] [--runs 3]
+// Usage: node scripts/lighthouse-summary.mjs [url, default http://localhost:3001] [--desktop] [--runs 3]
 //        node scripts/lighthouse-summary.mjs --ping [url]
 // Run it against a production build (`pnpm build` + `pnpm start`) — dev mode gives misleading performance.
 // Requires devDependencies: lighthouse, playwright (its Chromium is used if CHROME_PATH is not set).
@@ -17,7 +17,8 @@ const ping = args.includes("--ping");
 const desktop = args.includes("--desktop");
 const runsArg = args.indexOf("--runs");
 const runs = Math.min(5, Math.max(1, runsArg === -1 ? 1 : Number(args[runsArg + 1]) || 1));
-const url = args.find((a) => a.startsWith("http")) ?? "http://localhost:3000";
+// Default = the production build (`pnpm prod` → next start -p 3001). Lighthouse on the dev server (3000) is meaningless.
+const url = args.find((a) => a.startsWith("http")) ?? "http://localhost:3001";
 
 try {
   const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -30,6 +31,7 @@ if (ping) {
   console.log(`SERVER UP: ${url}`);
   process.exit(0);
 }
+if (/:3000\b/.test(url)) console.log("WARNING: port 3000 is usually the dev server — Performance and SEO (noindex) will be wrong. Use `pnpm prod` (3001).");
 
 // ---------- Lighthouse + Node version ----------
 const require = createRequire(join(process.cwd(), "package.json"));
@@ -154,7 +156,7 @@ const insights = perfRefs
   .map((r) => ({ id: r.id, a: lhr.audits[r.id] }))
   .filter(({ id, a }) => a && a.score !== null && a.score < 0.9 && a.scoreDisplayMode !== "informative"
     && a.scoreDisplayMode !== "notApplicable" && !["lcp-breakdown-insight", "lcp-discovery-insight"].includes(id))
-  .map(({ id, a }) => {
+  .map(({ a }) => {
     const m = a.metricSavings || {};
     const ms = (m.LCP || 0) + (m.FCP || 0) + (m.TBT || 0) + (m.INP || 0);
     const cls = m.CLS || 0;
