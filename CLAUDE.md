@@ -12,7 +12,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 - Figma file: Coffea - Free Responsive Coffee Shop Website Template (Community)   <!-- figma-import checks it against the file open in Figma -->
 - Figma link: <add the link of the copy> — a copy in my drafts, read through the Figma MCP Bridge plugin
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
-- Phase: build   <!-- scaffold | build | qa | done -->
+- Phase: qa   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
 
 | # | Section | id | Figma node | Status | Notes |
