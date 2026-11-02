@@ -173,8 +173,7 @@ export const site = {
     imageAlt: "",
   },
   footer: {
-    // NOTE: header logo reads "Coffea"; footer logo reads "Coffee" — intentional brand difference?
-    logo: "Coffee",
+    logo: "Coffea",
     columns: [
       {
         heading: "PRIVACY",
