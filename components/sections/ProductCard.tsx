@@ -26,7 +26,7 @@ export default function ProductCard({
   return (
     <article
       data-spec={s && `${s}-card`}
-      className="snap-start shrink-0 flex flex-col
+      className="group/card snap-start shrink-0 flex flex-col
         w-[85%] md:w-[calc(50%-0.25rem)] lg:w-[calc(33.333%-4px)] 3xl:w-[22.875rem]
         bg-warm-surface/20 border border-warm-surface rounded-[1.125rem] p-4 gap-4"
     >
@@ -39,7 +39,7 @@ export default function ProductCard({
             src={image}
             alt={imageAlt}
             fill
-            className="object-cover"
+            className="object-cover transition-[scale] duration-(--motion-base) ease-standard motion-safe:group-hover/card:scale-105"
             sizes="(min-width: 1920px) 366px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 85vw"
           />
         </div>

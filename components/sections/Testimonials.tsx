@@ -41,6 +41,8 @@ function TestimonialCard({
 }) {
   return (
     <div
+      data-reveal
+      style={{ "--reveal-index": domIndex } as React.CSSProperties}
       data-spec={active ? "testimonials-card-active" : undefined}
       className={cn(
         "rounded-[18px] overflow-hidden bg-warm-surface/40",
@@ -109,7 +111,7 @@ export default function Testimonials({ className }: { className?: string }) {
       <div className="mx-auto w-full max-w-content px-4 md:px-8 lg:px-12 3xl:px-0">
 
         {/* Heading: "Come and Join" + "our happy customers" */}
-        <div className="flex flex-col items-center">
+        <div data-reveal className="flex flex-col items-center">
           <p
             data-spec="testimonials-heading-label"
             className="w-fit font-reggae text-h3 leading-[1.44] text-foreground"

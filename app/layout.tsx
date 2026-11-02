@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
+import RevealObserver from "@/components/RevealObserver";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site-url";
 
 const playfair = Playfair_Display({
@@ -76,7 +77,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${outfit.variable} ${poppins.variable} ${reggae.variable} h-full antialiased`}
+      className={`${playfair.variable} ${outfit.variable} ${poppins.variable} ${reggae.variable} h-full antialiased motion-safe:scroll-smooth`}
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col">
           <script
@@ -86,6 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Header />
           {children}
           <Footer />
+          <RevealObserver />
         </body>
     </html>
   );
