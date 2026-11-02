@@ -36,7 +36,7 @@ export default function Promo({ className }: { className?: string }) {
           <a
             href={site.promo.ctaHref}
             data-spec="promo-cta"
-            className="mt-6 inline-flex items-center gap-1 bg-primary text-background font-sans font-medium text-base leading-[1.2] rounded-[6.25rem] py-4 px-9"
+            className="mt-6 inline-flex items-center gap-1 bg-primary text-background font-sans font-medium text-base leading-[1.2] rounded-[6.25rem] py-4 px-9 hover:bg-primary/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {site.promo.cta}
             <span className="flex items-center">

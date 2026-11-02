@@ -16,7 +16,7 @@ export default function HeaderNav() {
       <Link
         data-spec="header-logo"
         href="/"
-        className="font-display font-bold text-[2rem] leading-none text-white shrink-0 min-h-11 flex items-center"
+        className="font-display font-bold text-[2rem] leading-none text-white shrink-0 min-h-11 flex items-center hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         {site.name}
       </Link>
@@ -29,7 +29,7 @@ export default function HeaderNav() {
               <a
                 href={link.href}
                 data-spec={i === 0 ? "header-nav-link" : undefined}
-                className="font-sans font-medium text-lg text-white uppercase hover:text-white/80 transition-colors"
+                className="font-sans font-medium text-lg text-white uppercase hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
                 {link.label}
               </a>
@@ -38,7 +38,7 @@ export default function HeaderNav() {
           <li>
             <a
               href={site.nav.cta.href}
-              className="font-sans font-semibold text-lg text-white uppercase hover:text-white/80 transition-colors"
+              className="font-sans font-semibold text-lg text-white uppercase hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               {site.nav.cta.label}
             </a>
@@ -52,7 +52,7 @@ export default function HeaderNav() {
         <button
           data-spec="header-search"
           aria-label="Search"
-          className="hidden lg:flex items-center justify-center w-[3.8125rem] h-[3.8125rem] rounded-[6.25rem] bg-white text-foreground shrink-0 hover:bg-white/90 transition-colors"
+          className="hidden lg:flex items-center justify-center w-[3.8125rem] h-[3.8125rem] rounded-[6.25rem] bg-white text-foreground shrink-0 hover:bg-white/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           <Search size={21} strokeWidth={2.5} />
         </button>
@@ -62,7 +62,7 @@ export default function HeaderNav() {
           <SheetTrigger asChild>
             <button
               aria-label="Open menu"
-              className="lg:hidden flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem] text-white"
+              className="lg:hidden flex items-center justify-center min-w-[2.75rem] min-h-[2.75rem] text-white hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <Menu size={24} />
             </button>
@@ -81,7 +81,7 @@ export default function HeaderNav() {
                       <SheetClose asChild>
                         <a
                           href={link.href}
-                          className="font-sans font-medium text-2xl text-white uppercase hover:text-white/80 transition-colors"
+                          className="font-sans font-medium text-2xl text-white uppercase hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         >
                           {link.label}
                         </a>
@@ -92,7 +92,7 @@ export default function HeaderNav() {
                     <SheetClose asChild>
                       <a
                         href={site.nav.cta.href}
-                        className="font-sans font-semibold text-2xl text-white uppercase hover:text-white/80 transition-colors"
+                        className="font-sans font-semibold text-2xl text-white uppercase hover:text-white/80 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         {site.nav.cta.label}
                       </a>

@@ -43,12 +43,20 @@ export default function ProductCard({
             sizes="(min-width: 1920px) 366px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 85vw"
           />
         </div>
-        <Heart
-          data-spec={s && `${s}-card-heart`}
-          size={33}
-          className="absolute top-[18px] right-[27px] stroke-[#f1f0ee] fill-none"
-          aria-hidden
-        />
+        {/* TODO: favorites logic */}
+        {/* Button offset by -10px (p-2.5) so the icon stays at top-[18px] right-[27px] from the image edge */}
+        <button
+          type="button"
+          aria-label="Add to favorites"
+          className="absolute top-[8px] right-[17px] p-2.5 hover:opacity-70 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          <Heart
+            data-spec={s && `${s}-card-heart`}
+            size={33}
+            className="stroke-[#f1f0ee] fill-none"
+            aria-hidden
+          />
+        </button>
       </div>
 
       {/* Figma desc frame is fixed 47px (Fill × 47) with Vertical Trim; trimmed text ~43px,
@@ -79,7 +87,7 @@ export default function ProductCard({
           <button
             data-spec={s && `${s}-card-btn`}
             type="button"
-            className="font-alt font-medium text-sm bg-dark-roast text-white rounded-[0.5rem] py-3 px-[1.625rem] 3xl:py-[0.625rem]"
+            className="font-alt font-medium text-sm bg-dark-roast text-white rounded-[0.5rem] py-3 px-[1.625rem] 3xl:py-[0.625rem] hover:opacity-90 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-roast"
           >
             {cta}
           </button>

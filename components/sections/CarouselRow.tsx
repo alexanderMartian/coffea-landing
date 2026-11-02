@@ -22,7 +22,8 @@ export default function CarouselRow({ children }: { children: React.ReactNode })
         onClick={() => scroll(-1)}
         className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10
                    size-[4.4375rem] rounded-full bg-warm-surface
-                   items-center justify-center text-foreground"
+                   items-center justify-center text-foreground
+                   hover:bg-warm-surface/80 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
       >
         <ArrowLeft size={34} aria-hidden />
       </button>
@@ -41,7 +42,8 @@ export default function CarouselRow({ children }: { children: React.ReactNode })
         onClick={() => scroll(1)}
         className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10
                    size-[4.4375rem] rounded-full bg-warm-surface
-                   items-center justify-center text-foreground"
+                   items-center justify-center text-foreground
+                   hover:bg-warm-surface/80 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
       >
         <ArrowRight size={34} aria-hidden />
       </button>

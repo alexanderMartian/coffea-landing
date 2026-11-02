@@ -85,6 +85,23 @@ Figma can trim a text box from the cap height of the first line to the baseline 
 | `rotation` | `rotate-*` (mostly decor) |
 | `constraints` | only for absolute children: MIN = left/top, MAX = right/bottom, CENTER, STRETCH = inset-x-0, SCALE = % |
 
+## Interactive elements (Figma rarely draws hover/focus — add them anyway)
+- Anything clickable is `<a href>` (goes somewhere) or `<button type="button">` (does something) — never a `div` with `onClick`.
+- **Cursor:** Tailwind v4 gives buttons `cursor: default`. With the first tokens add to `app/globals.css`:
+  ```css
+  @layer utilities {
+    /* :where() = zero specificity, so cursor-not-allowed / cursor-wait classes still win */
+    :where(button:not(:disabled), [role="button"]:not(:disabled)) { cursor: pointer; }
+  }
+  ```
+  (In `@layer base` the rule can lose to base styles imported later, e.g. from shadcn — Coffea needed `utilities`. A plain `button:not(:disabled)` in `utilities` would beat every `cursor-*` class — keep `:where()`. Don't add `label` — a visible label of a checkbox gets `cursor-pointer` itself.)
+- **Hover** on every link and button, subtle and in the design's palette: `hover:bg-primary/90`, `hover:opacity-80`, `hover:underline`, `hover:bg-white/90` on light pills. Text links in footers/nav: `hover:underline` or `hover:opacity-80`.
+- **Focus:** `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current` (or `ring-*`) — never `outline-none` without a replacement. On an input inside a pill, put the focus style on the pill (`focus-within:`).
+- **Logo** in header and footer = `<a href="/" aria-label="<Brand> — home">`.
+- **Icon that looks clickable** (heart, arrows, search, social): `<button type="button" aria-label="…">` or a link with `aria-label`; icon `aria-hidden`; hit area ≥ 44 px on touch widths, visual size from Figma. A button without logic yet ("Add to favorites") gets a `// TODO: logic` comment; toggles get `aria-pressed`.
+- Purely decorative icons stay `aria-hidden`, with no hover and no pointer — don't make them look clickable.
+- `section-check` reports `no pointer cursor` (≥ 1024) and `no hover state` (design width).
+
 ## Forms (UI only — logic is a separate task)
 `<form>` · `<input type="email" name="email">` (or the right type) with a `<label>` — visible if the design has one, otherwise `sr-only` · `<button type="submit">` · inputs `text-base` (16 px, no iOS zoom) · below `md:` input and button stacked, both `w-full`, `min-h-11` · placeholder text from the design.
 

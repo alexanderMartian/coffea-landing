@@ -56,7 +56,7 @@ export default function Hero() {
           <a
             href={site.hero.ctaHref}
             data-spec="hero-cta"
-            className="inline-flex items-center justify-center bg-white text-foreground font-sans font-medium text-base lg:text-lg rounded-[6.25rem] px-10 min-h-[3.4375rem] w-fit"
+            className="inline-flex items-center justify-center bg-white text-foreground font-sans font-medium text-base lg:text-lg rounded-[6.25rem] px-10 min-h-[3.4375rem] w-fit hover:bg-white/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             {site.hero.cta}
           </a>

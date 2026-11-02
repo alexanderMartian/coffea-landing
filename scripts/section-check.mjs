@@ -461,6 +461,14 @@ async function rules(page, width) {
           .filter((el) => { const r = el.getBoundingClientRect(); return r.width < 44 || r.height < 44; });
         if (tap.length) issues.push(`tap target < 44px: ${tap.slice(0, 3).map((el) => { const r = el.getBoundingClientRect(); return `${window.__label(el)} ${Math.round(r.width)}×${Math.round(r.height)}`; }).join(" | ")}`);
       }
+      // 4b. pointer cursor on everything clickable (mouse widths only). Tailwind v4 gives buttons cursor: default.
+      if (width >= 1024) {
+        const noPointer = all
+          .filter((el) => el.matches("a[href], button:not(:disabled), [role=button], summary, label[for], select, input[type=submit], input[type=button], input[type=checkbox], input[type=radio]"))
+          .filter((el) => { const r = el.getBoundingClientRect(); return r.width > 2 && r.height > 2; }) // skip sr-only labels
+          .filter((el) => getComputedStyle(el).cursor !== "pointer");
+        if (noPointer.length) issues.push(`no pointer cursor (clickable): ${noPointer.slice(0, 4).map(window.__label).join(" | ")}`);
+      }
       // 5. overlapping texts
       const pairs = [];
       const list = texts.filter((el) => !el.closest("[data-allow-overlap]")).slice(0, 200);
@@ -486,6 +494,30 @@ async function rules(page, width) {
     },
     { sid: id, width }
   );
+}
+
+// ---------- hover states (design width, mouse) ----------
+// Every button / link should visibly react to the mouse (color, background, opacity, underline, shadow, transform…),
+// even when Figma has no hover state drawn.
+async function hoverCheck(page) {
+  const SEL = "a[href], button:not(:disabled), [role=button]";
+  const handles = await page.$$(`#${id} :is(${SEL})`);
+  const look = (el) => {
+    const pick = (e) => { const s = getComputedStyle(e); return [s.color, s.backgroundColor, s.opacity, s.textDecorationLine, s.boxShadow, s.transform, s.borderColor, s.filter, s.outlineStyle].join("|"); };
+    return [pick(el), ...[...el.querySelectorAll("*")].slice(0, 6).map(pick)].join("#");
+  };
+  const none = [];
+  for (const h of handles.slice(0, 16)) {
+    const visible = await h.evaluate((el) => window.__visible(el));
+    if (!visible) continue;
+    const before = await h.evaluate(look);
+    try { await h.hover({ timeout: 1500 }); } catch { continue; }
+    await page.waitForTimeout(30);
+    const after = await h.evaluate(look);
+    if (before === after) none.push(await h.evaluate((el) => window.__label(el)));
+    await page.mouse.move(0, 0);
+  }
+  return none;
 }
 
 // ---------- page mode ----------
@@ -629,6 +661,10 @@ for (const width of widths) {
   }
 
   const issues = await rules(page, width);
+  if (width === pageWidth) {
+    const noHover = await hoverCheck(page);
+    if (noHover.length) issues.push(`no hover state: ${noHover.slice(0, 4).join(" | ")}${noHover.length > 4 ? ` … +${noHover.length - 4}` : ""}`);
+  }
   for (const i of issues) (ruleHits[i] ??= []).push(width);
 
   const head = lines.length && !lines[0].startsWith("   ") ? lines.shift() : "";

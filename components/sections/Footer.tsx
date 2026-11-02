@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { site } from "@/content/site";
 
@@ -13,12 +14,14 @@ export default function Footer({ className }: { className?: string }) {
 
           {/* Logo */}
           <div className="3xl:w-[221px] 3xl:shrink-0">
-            <span
+            <Link
+              href="/"
+              aria-label="Coffea — home"
               data-spec="footer-logo"
-              className="font-display font-bold text-white [font-variant-caps:small-caps] text-[1.75rem] 3xl:text-[2.4rem] leading-[1.2] inline-block"
+              className="font-display font-bold text-white [font-variant-caps:small-caps] text-[1.75rem] 3xl:text-[2.4rem] leading-[1.2] inline-flex items-center min-h-11 lg:min-h-0 hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               {site.footer.logo}
-            </span>
+            </Link>
           </div>
 
           {/* Nav columns */}
@@ -46,7 +49,7 @@ export default function Footer({ className }: { className?: string }) {
                         <a
                           href={link.href}
                           data-spec={i === 0 && j === 0 ? "footer-privacy-link" : undefined}
-                          className="font-alt text-sm 3xl:text-lg text-white inline-flex items-center min-h-11 min-w-[44px] lg:min-h-0 lg:min-w-0 leading-[1.5]"
+                          className="font-alt text-sm 3xl:text-lg text-white inline-flex items-center min-h-11 min-w-[44px] lg:min-h-0 lg:min-w-0 leading-[1.5] hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         >
                           {link.label}
                         </a>
@@ -73,7 +76,7 @@ export default function Footer({ className }: { className?: string }) {
                   key={s.label}
                   href={s.href}
                   aria-label={s.label}
-                  className="inline-flex items-center justify-center w-11 h-11 lg:w-auto lg:h-auto"
+                  className="inline-flex items-center justify-center w-11 h-11 lg:w-auto lg:h-auto hover:opacity-80 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-sm"
                 >
                   <Image
                     data-spec={i === 0 ? "footer-social-icon" : undefined}

@@ -63,7 +63,7 @@ export default function Newsletter({ className }: { className?: string }) {
           {/* Input pill — data-spec on the pill wrapper to match Figma Frame 20 */}
           <div
             data-spec="newsletter-input"
-            className="relative flex items-center w-full min-h-[44px] md:flex-1 3xl:flex-none 3xl:w-[364px] 3xl:h-[44px] rounded-[100px] bg-background pl-6 pr-4 3xl:py-[10px] 3xl:pr-[190px]"
+            className="relative flex items-center w-full min-h-[44px] md:flex-1 3xl:flex-none 3xl:w-[364px] 3xl:h-[44px] rounded-[100px] bg-background pl-6 pr-4 3xl:py-[10px] 3xl:pr-[190px] focus-within:ring-2 focus-within:ring-foreground/60 transition-shadow"
           >
             <Mail
               className="shrink-0 mr-[10px] text-foreground pointer-events-none"
@@ -75,13 +75,13 @@ export default function Newsletter({ className }: { className?: string }) {
               type="email"
               name="email"
               placeholder={site.newsletter.inputPlaceholder}
-              className="flex-1 min-w-0 min-h-[44px] 3xl:min-h-0 bg-transparent font-alt font-semibold text-base text-foreground placeholder:text-foreground focus:outline-none focus-visible:ring-0"
+              className="flex-1 min-w-0 min-h-[44px] 3xl:min-h-0 bg-transparent font-alt font-semibold text-base text-foreground placeholder:text-foreground focus:outline-none"
             />
           </div>
           <button
             type="submit"
             data-spec="newsletter-btn"
-            className="w-full md:w-auto min-h-[44px] 3xl:w-[138px] 3xl:h-[44px] rounded-[100px] bg-foreground text-background font-alt font-semibold text-base px-7"
+            className="w-full md:w-auto min-h-[44px] 3xl:w-[138px] 3xl:h-[44px] rounded-[100px] bg-foreground text-background font-alt font-semibold text-base px-7 hover:bg-foreground/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
           >
             {site.newsletter.cta}
           </button>

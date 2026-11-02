@@ -152,6 +152,13 @@
 }
 
 @layer utilities {
+  /* Tailwind v4 preflight resets button cursor to default — override here */
+  :where(button:not(:disabled), [role="button"]:not(:disabled)) {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
   .font-alt {
     font-family: var(--font-poppins);
   }
