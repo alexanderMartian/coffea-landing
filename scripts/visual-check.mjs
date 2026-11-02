@@ -17,7 +17,9 @@ const args = process.argv.slice(2);
 const ping = args.includes("--ping");
 const rest = args.filter((a) => a !== "--ping");
 const base = rest[0]?.startsWith("http") ? rest.shift() : "http://localhost:3000";
-const paths = rest.length ? rest : ["/"];
+// Git Bash (Windows) rewrites a "/path" argument into "C:/Program Files/Git/path" — undo that.
+const unMsys = (p) => p.replace(/^[A-Za-z]:\/.*?\/Git(?=\/|$)/i, "") || "/";
+const paths = rest.length ? rest.map(unMsys) : ["/"];
 const WIDTHS = [360, 768, 1024, 1440, 1920];
 const MENU_WIDTH = 360;
 const KEYBOARD_WIDTH = 1440;
@@ -109,9 +111,13 @@ async function checkMenu(page) {
   const issues = [];
   const btn = page.locator("[data-qa-menu]");
   await btn.click({ timeout: 3000 });
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(900); // open animation
   const open = await page.evaluate(() => {
-    const dlg = [...document.querySelectorAll("[role=dialog], [data-state=open], [aria-modal=true]")].find(window.__shown);
+    // Prefer the dialog itself over overlays (Radix renders an overlay with data-state=open before the content).
+    const linksIn = (d) => [...d.querySelectorAll("a[href]")].filter(window.__shown).length;
+    const cands = [...document.querySelectorAll("[role=dialog], [aria-modal=true]")].filter(window.__shown);
+    const fallback = [...document.querySelectorAll("[data-state=open]")].filter((d) => window.__shown(d) && d !== document.querySelector("[data-qa-menu]"));
+    const dlg = (cands.length ? cands : fallback).sort((x, y) => linksIn(y) - linksIn(x))[0];
     const links = dlg ? [...dlg.querySelectorAll("a[href]")].filter(window.__shown) : [];
     if (links[0]) links[0].setAttribute("data-qa-menu-link", "1");
     return { dialog: !!dlg, links: links.length, expanded: document.querySelector("[data-qa-menu]")?.getAttribute("aria-expanded") };
@@ -120,7 +126,7 @@ async function checkMenu(page) {
   if (!open.links) issues.push("mobile menu: opened, but has no visible links");
   if (open.expanded === "false") issues.push("mobile menu: aria-expanded stays false when open");
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(700);
   const afterEsc = await page.evaluate(() => !![...document.querySelectorAll("[role=dialog], [aria-modal=true]")].find(window.__shown));
   if (afterEsc) {
     issues.push("mobile menu: Escape doesn't close it");
@@ -128,7 +134,7 @@ async function checkMenu(page) {
   }
   if (open.links) {
     await btn.click({ timeout: 3000 });
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(900);
     const link = page.locator("[data-qa-menu-link]");
     if (await link.count()) {
       await link.first().click({ timeout: 3000 });
@@ -150,16 +156,17 @@ async function checkKeyboard(page) {
     };
     window.__look = look;
     window.__base = new Map();
+    window.__tabN = 0;
     for (const el of document.querySelectorAll("a[href], button, input, select, textarea, [tabindex]")) window.__base.set(el, look(el));
   });
   const noFocus = [], hidden = [], seen = new Set();
   let stops = 0;
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 150; i++) {
     await page.keyboard.press("Tab");
     const r = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el === document.body) return null;
-      const key = window.__label(el) + "@" + Math.round(el.getBoundingClientRect().top + window.scrollY);
+      const key = el.dataset.qaTab || (el.dataset.qaTab = String(++window.__tabN)); // identity, not text — 4 "Order Now" in a row are 4 stops
       return { key, label: window.__label(el), shown: window.__shown(el), changed: window.__look(el) !== window.__base.get(el) };
     });
     if (!r) break;
