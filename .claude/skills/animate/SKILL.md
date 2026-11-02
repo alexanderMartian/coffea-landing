@@ -19,7 +19,8 @@ Code patterns live in `references/recipes.md` — read it first and copy from it
    Colour and opacity changes may stay.
 5. **CSS first.** The Motion library only for: exit animations of elements leaving the DOM, layout animations,
    drag, springs, sequences. Never for reveal-on-scroll or hover. Adding or removing a package → ask the user first.
-6. Sections stay Server Components — the reveal works through a `data-reveal` attribute, not `"use client"`.
+6. Sections stay Server Components — the reveal works through the server `<Reveal>` wrapper (`data-reveal` +
+   `suppressHydrationWarning`), never a raw `data-reveal` attribute and never `"use client"`.
 7. Durations and easing come from the tokens: hover 150 ms, UI 250 ms, reveal 500 ms, stagger 70 ms (max 6 items),
    `ease-enter` for appearing, `ease-standard` for state changes. Nothing loops forever on a business landing
    (WCAG 2.2.2: an auto-playing animation longer than 5 s needs a pause button).
@@ -48,9 +49,9 @@ One table, then stop and wait:
 | Section | Element | Effect | Implementation |
 |---|---|---|---|
 | (all) | tokens, smooth anchor scroll | — | `globals.css`, `<html>` |
-| Coffee menu | heading block | reveal | `data-reveal` |
-| Coffee menu | cards row | reveal once (carousel) | `data-reveal` on the row |
-| Features | 4 cards | reveal + stagger | `data-reveal` + `--reveal-index` |
+| Coffee menu | heading block | reveal | `<Reveal as="h2">` |
+| Coffee menu | cards row | reveal once (carousel) | `<Reveal>` around the row |
+| Features | 4 cards | reveal + stagger | `<Reveal as="li" index={i}>` |
 | (cards) | product card | lift on hover, image zoom | Tailwind classes |
 | … | | | |
 
@@ -73,12 +74,13 @@ From `references/recipes.md`:
 1. Tokens (section 1) and reveal CSS (section 2) in `app/globals.css`. Unlayered CSS beats Tailwind utilities, so the
    reveal rules only set state on `[data-reveal="pending"]`; don't put `data-reveal` on an element that has its own
    `opacity-*`, `translate-*` or `transition-*` classes — wrap it.
-2. `components/RevealObserver.tsx`, mounted once at the end of `<body>` in `app/layout.tsx`.
+2. `components/RevealObserver.tsx`, mounted once at the end of `<body>` in `app/layout.tsx`, and
+   `components/Reveal.tsx` (the wrapper sections use).
 3. `<html className="motion-safe:scroll-smooth" data-scroll-behavior="smooth">` (merge with existing classes).
 4. Replace every `transition-all` found in Step 0 with the named properties.
 
 ## Step 4 — apply per section
-- Add `data-reveal` to wrappers exactly as approved in Step 2; stagger with `style={{ "--reveal-index": i }}`.
+- Wrap exactly what was approved in Step 2 with `<Reveal>`; stagger with `index={i}`.
 - Hover classes with tokens: `duration-(--motion-fast) ease-standard`; cards `motion-safe:hover:-translate-y-1`.
 - Don't touch sizes, spacing, colours, fonts or structure — the static look must stay pixel-identical
   (`section-check` runs with reduced motion, so it compares the final state).
@@ -104,6 +106,6 @@ From `references/recipes.md`:
 
 ## Step 6 — finish
 - Add to `CLAUDE.md` → Conventions: `Animations: /animate standard package — tokens in globals.css,
-  data-reveal + RevealObserver, hover via tokens; first screen never animated.`
+  <Reveal> + RevealObserver, hover via tokens; first screen never animated.`
 - Report in Ukrainian: which files changed and what each change does (how the reveal works in one paragraph), the
   Lighthouse before → after, what was left out and why. Don't commit.

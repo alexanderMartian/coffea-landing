@@ -80,25 +80,49 @@ export default function RevealObserver() {
 ```
 Mount once at the end of `<body>` in `app/layout.tsx`: `<RevealObserver />`.
 
+`components/Reveal.tsx` — the only way sections use the reveal (Server Component, no `"use client"`):
+```tsx
+import type { CSSProperties, ElementType, ComponentPropsWithoutRef } from "react";
+
+type RevealProps<T extends ElementType> = {
+  as?: T;
+  /** Stagger position inside a group; becomes --reveal-index. */
+  index?: number;
+} & Omit<ComponentPropsWithoutRef<T>, "as" | "index">;
+
+// RevealObserver flips data-reveal to "pending"/"shown" on the client — often BEFORE below-the-fold sections hydrate
+// (React hydrates in chunks). The attribute then differs from the server HTML on purpose; suppressHydrationWarning
+// silences that for this element's own attributes only (children are still checked).
+export default function Reveal<T extends ElementType = "div">({ as, index, style, ...props }: RevealProps<T>) {
+  const Tag: ElementType = as ?? "div";
+  const mergedStyle = index === undefined ? style : ({ ...style, "--reveal-index": index } as CSSProperties);
+  return <Tag data-reveal="" suppressHydrationWarning style={mergedStyle} {...props} />;
+}
+```
+Never write a raw `data-reveal` attribute in a section — without `suppressHydrationWarning` the dev console shows
+"A tree hydrated but some attributes … didn't match" (Coffea: seen only on the dev server; production is silent, so
+run `visual-check` on dev too).
+
 Use in sections (Server Components):
 ```tsx
-<div data-reveal>{/* heading + intro of a section */}</div>
+<Reveal>{/* heading + intro of a section */}</Reveal>
+<Reveal as="h2" className="…">{title}</Reveal>
 
 <ul className="grid …">
   {items.map((item, i) => (
-    <li key={item.id} data-reveal style={{ "--reveal-index": i } as React.CSSProperties}>
+    <Reveal as="li" key={item.id} index={i}>
       <ProductCard {...item} />
-    </li>
+    </Reveal>
   ))}
 </ul>
 ```
-- Put `data-reveal` on a **wrapper**, not on a link/button and not on an element with its own `transition-*`,
+- Put `<Reveal>` on a **wrapper**, not on a link/button and not on an element with its own `transition-*`,
   `opacity-*` or `translate-*` classes (the reveal CSS is unlayered and would override them).
 - Never on Header, Hero or anything in the first viewport. Never on `<section>` itself if the section has a
   background — reveal its content, so the background doesn't flash.
 - Stagger is capped at 6 items (`min(…, 6)`), so long lists don't wait seconds for the last card.
-- Horizontal carousels: reveal the row once, not each card (cards 5+ are off-screen sideways), with `data-reveal`
-  on a wrapper `<div>` around the scroll container.
+- Horizontal carousels: reveal the row once, not each card (cards 5+ are off-screen sideways), with `<Reveal>`
+  around the scroll container.
 - Images with `mix-blend-*` (and their ancestors): no reveal, no zoom — see section 7.
 - Decorative, absolutely positioned images: fade only — `style={{ "--reveal-distance": "0px" }}`.
 
