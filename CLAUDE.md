@@ -14,7 +14,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
 - Phase: qa   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
-- Lighthouse (production, 2026-11-02): mobile 89 (lab, median of 3), desktop 99, a11y/BP/SEO 100
+- Lighthouse (production, 2026-11-03): mobile 86 (82–87, lab, median of 3), a11y/BP/SEO 100; 2026-11-02: mobile 89, desktop 99
 
 | # | Section | id | Figma node | Status | Notes |
 |---|---|---|---|---|---|
@@ -48,7 +48,7 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 
 ## Structure
 - `app/` — routes; `app/layout.tsx` holds fonts, metadata defaults, analytics
-- `app/api/contact/route.ts` — form endpoint
+- `app/api/newsletter/route.ts` — newsletter signup endpoint (Resend)
 - `components/ui/` — shadcn (generated; edit only when needed)
 - `components/sections/` — one file per landing section (Hero, Services, Pricing, FAQ, Contact…)
 - `content/site.ts` — ALL texts, links, prices, contacts. Components never hardcode copy.
@@ -64,13 +64,26 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - Colors, radii, fonts come from theme tokens — no raw hex values in components. Merge classes with `cn()`.
 - Images: always `next/image` with `width`/`height` or `fill` + `sizes`. Only the hero (LCP) image gets `loading="eager"` + `fetchPriority="high"` (`priority` is deprecated in Next 16).
 - Fonts: `next/font`, families as in the design, `display: "swap"`. An extra family gets its own token/utility; never swap `--font-sans` for one section.
-- Animations: `/animate` standard package done — tokens in `globals.css`, `data-reveal` + `RevealObserver`, hover via tokens; first screen never animated; no reveal/zoom on `mix-blend-multiply` images. Rules: added at the end with `/animate` — CSS first (tokens in `globals.css`, `data-reveal` + one `RevealObserver`, hover via Tailwind classes), the Motion library only for what CSS can't do (exit, layout, drag). Never animate the first screen on load; only transform/opacity; everything respects `prefers-reduced-motion`. Don't add animations while building sections.
+- Animations: `/animate` standard package done — tokens in `globals.css`, `<Reveal>` wrapper + `RevealObserver`, hover via tokens; first screen never animated; no reveal/zoom on `mix-blend-multiply` images. Rules: added at the end with `/animate` — CSS first (tokens in `globals.css`, `data-reveal` + one `RevealObserver`, hover via Tailwind classes), the Motion library only for what CSS can't do (exit, layout, drag). Never animate the first screen on load; only transform/opacity; everything respects `prefers-reduced-motion`. Don't add animations while building sections.
 - Forms: one Zod schema in `lib/schemas.ts` → `zodResolver` on the client AND `safeParse` in the route handler. Add a honeypot field. Return `{ ok: boolean, error?: string }`.
 - Secrets only in env vars (`RESEND_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `CONTACT_TO_EMAIL`). Never `NEXT_PUBLIC_` for secrets. Keep `.env.example` updated.
 - SEO: `metadata` in `app/layout.tsx` with `metadataBase`, title template, description, `openGraph`; `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.(png|tsx)`. Exactly one `<h1>` per page; `<html lang>` set.
 - Accessibility: semantic tags (`header`, `main`, `section` with headings, `footer`), labels on all inputs, visible focus, links for navigation / buttons for actions, alt text on meaningful images (`alt=""` on decorative).
 - TypeScript strict: no `any`, no unnecessary `!`.
 - Never invent testimonials, reviews, client logos, stats or awards. Design copy (Lorem ipsum included) is rendered verbatim; fake copy is marked with a `// PLACEHOLDER: ...` comment above the field in `content/site.ts` — never inside the rendered text or `alt`. `alt` describes the image.
+
+## Decisions
+<!-- Deliberate choices. Reviewers and agents must not report these as problems. -->
+- Portfolio / concept site: menu items, prices and copy are invented on purpose; testimonials are samples, labelled
+  "Sample reviews — Coffea is a concept project." under the heading (2026-11-02).
+- Placeholder links: links without a real target go to a section anchor or `/` (social icons, legal pages, login,
+  about) — `// TODO: replace / with real URLs` (2026-11-02).
+- Newsletter: Resend key not created yet; without `RESEND_API_KEY` / `NOTIFICATION_EMAIL` the endpoint answers 503 with
+  a polite message — expected until deploy. No rate limiting (portfolio; honeypot only).
+- Promo/Newsletter photos keep `mix-blend-multiply` and are not animated (2026-11-02).
+- Lighthouse mobile 86–87 accepted (A/B showed the animations cost nothing; `inlineCss` was tried and made it worse;
+  `zod/mini` skipped). Recheck with PageSpeed Insights after deploy.
+- `motion` package stays installed but unused for now — decide at the end.
 
 ## Definition of Done
 1. Section/feature done → `pnpm lint` and `pnpm typecheck` pass.
