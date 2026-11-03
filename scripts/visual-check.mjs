@@ -63,8 +63,10 @@ const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath
 let total = 0;
 const hits = {}; // issue -> widths (same problem at several widths is printed once)
 
-// Dev server traffic that is not a bug on the page.
-const NOISE = [/_next\/webpack-hmr/, /__nextjs/, /_next\/static\/webpack\//, /\/__webpack_hmr/, /favicon\.ico$/, /[?&]_rsc=/];
+// Dev server traffic that is not a bug on the page. Vercel Analytics / Speed Insights load a debug script from
+// va.vercel-scripts.com in development (headless Chromium blocks it); in production they use /_vercel/* on the site.
+const NOISE = [/_next\/webpack-hmr/, /__nextjs/, /_next\/static\/webpack\//, /\/__webpack_hmr/, /favicon\.ico$/, /[?&]_rsc=/,
+  /va\.vercel-scripts\.com\//, /\/_vercel\/(insights|speed-insights)\//];
 const isNoise = (url, err = "") => NOISE.some((r) => r.test(url)) || /ERR_ABORTED/.test(err);
 
 // ---------- motion recorder (injected before the page's own scripts) ----------
@@ -248,6 +250,7 @@ async function openPage(width, path, problems, contextOptions = {}) {
       }
       if (m.type() !== "error") return;
       if (/Download the React DevTools|\[HMR\]|\[Fast Refresh\]/.test(t)) return;
+      if (/Failed to load resource/.test(t) && isNoise(m.location()?.url || "")) return; // same noise as requests
       problems.push(`console: ${t.slice(0, 160)}`);
     });
     page.on("pageerror", (e) => problems.push(`page error: ${String(e.message).slice(0, 160)}`));

@@ -100,7 +100,8 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 ## Don't
 - Don't install packages, change the stack, or add a CMS without asking.
 - Don't edit `components/ui/` wholesale or reformat files you didn't change.
-- Don't start long-running processes you don't stop; tell me which server must be running instead.
+- Don't start or stop the dev / production servers (pnpm dev, pnpm prod) — if a check needs one, ask me to start it.
+- Don't rewrite files with shell commands — Edit/Write only, so the diff is visible. Line endings are normalized by .gitattributes; don't fix them with scripts.
 
 # Compact instructions
 When compacting, keep: current task and its acceptance criteria, files changed, failing checks and their errors. Drop exploration output and old screenshots.
