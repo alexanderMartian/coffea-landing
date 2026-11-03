@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import RevealObserver from "@/components/RevealObserver";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site-url";
 
 const playfair = Playfair_Display({
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <Footer />
         <RevealObserver />
+        <Analytics />
       </body>
     </html>
   );

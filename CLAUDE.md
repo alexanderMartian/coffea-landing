@@ -4,7 +4,7 @@
 <!-- Next.js rules for AI agents (created by create-next-app / next dev): read the bundled docs in node_modules/next/dist/docs/ before writing Next.js code. -->
 
 Coffee shop landing: menu highlights (coffee, desserts), about, ordering CTA. Portfolio piece, built from a Figma Community template.
-Package: portfolio (no client). Live URL: <not deployed yet>
+Package: portfolio (no client). Live URL: https://coffea-landing.vercel.app
 
 ## Project status
 <!-- Filled at project start by /landing; updated after every section. The only source of truth for progress. -->
@@ -14,7 +14,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
 - Phase: qa   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
-- Lighthouse (production, 2026-11-03): mobile 86 (82–87, lab, median of 3), a11y/BP/SEO 100; 2026-11-02: mobile 89, desktop 99
+- PageSpeed Insights (production, 2026-11-03): mobile 96, a11y/BP/SEO 100, LCP 2.7 s, CLS 0
 
 | # | Section | id | Figma node | Status | Notes |
 |---|---|---|---|---|---|
@@ -89,6 +89,7 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
   menu carousel goes through the card buttons (row is `role="region"` + `aria-label`, no `tabIndex`).
 - Texts were replaced with portfolio copy (client-copy), so the `section-check` texts check does not match the design —
   expected (2026-11-03).
+- Vercel Web Analytics (cookieless, no consent banner) (2026-11-03).
 - Footer logo is "Coffea" (site.ts); `design/footer.spec.json` still says "Coffee" (Figma template typo).
 
 ## Definition of Done
