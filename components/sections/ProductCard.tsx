@@ -34,7 +34,7 @@ export default function ProductCard({
         data-spec={s && `${s}-card-image`}
         className="relative overflow-hidden rounded-[0.75rem]"
       >
-        <div className="aspect-[334/364]">
+        <div className="relative aspect-[334/364]">
           <Image
             src={image}
             alt={imageAlt}

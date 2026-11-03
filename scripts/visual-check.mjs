@@ -5,7 +5,7 @@
 // Usage: node scripts/visual-check.mjs [baseUrl] [paths...]   e.g. node scripts/visual-check.mjs http://localhost:3000 / /privacy
 //        node scripts/visual-check.mjs --ping [baseUrl]
 //
-// Every width (360 768 1024 1440 1920): console errors, page errors, failed requests / HTTP ≥ 400 (dev-server noise
+// Every width (360 768 1024 1440 1920): console errors, next/image warnings, page errors, failed requests / HTTP ≥ 400 (dev-server noise
 // filtered), broken images, <img> without alt, number of <h1>, horizontal overflow, blocks stuck at opacity 0.
 // Once per page: in-page anchor links (#id) that point nowhere, href="#" placeholders (info), mobile menu
 // (360: open → links visible → link closes it; Escape closes it), keyboard walk with Tab (1440: visible focus on
@@ -205,6 +205,9 @@ const motionDone = (page) => page.waitForFunction(() => window.__motion?.done, n
 // Scroll through the page so lazy images, reveal-on-scroll and whileInView animations run, then wait for the last
 // (staggered) reveal to finish.
 async function scrollThrough(page) {
+  // A real visitor's scroll is user input, which ends LCP measurement. Our programmatic scroll is not, so images far
+  // below the fold become "LCP" and next/image warns about them — ignore LCP warnings from here on (see openPage).
+  page.__scrolled = true;
   await page.evaluate(async () => {
     const step = Math.max(400, Math.floor(window.innerHeight * 0.8));
     for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
@@ -228,9 +231,22 @@ async function openPage(width, path, problems, contextOptions = {}) {
   const page = await browser.newPage({ viewport: { width, height: 900 }, ...contextOptions });
   await page.addInitScript(MOTION_RECORDER);
   if (problems) {
+    const imageWarnings = new Set();
     page.on("console", (m) => {
-      if (m.type() !== "error") return;
       const t = m.text();
+      // Framework warnings that are real bugs (dev server only): next/image misuse (fill without a positioned
+      // parent, missing sizes, LCP image without loading="eager"…). The same warning for several images is reported
+      // once, with the first image's file name.
+      if (m.type() === "warning" && /^Image with src /.test(t)) {
+        if (page.__scrolled && /Largest Contentful Paint/i.test(t)) return; // artefact of our scroll, not a real LCP
+        const kind = t.replace(/^Image with src "[^"]*"/, "");
+        if (imageWarnings.has(kind)) return;
+        imageWarnings.add(kind);
+        const file = (t.match(/^Image with src "([^"]*)"/)?.[1] || "").split("/").pop();
+        problems.push(`next/image warning (${file}): Image${kind.slice(0, 140)}`);
+        return;
+      }
+      if (m.type() !== "error") return;
       if (/Download the React DevTools|\[HMR\]|\[Fast Refresh\]/.test(t)) return;
       problems.push(`console: ${t.slice(0, 160)}`);
     });

@@ -284,6 +284,9 @@ export const site = {
     subheading: "Subscribe to our newsletter and get 15% off discount code.",
     inputPlaceholder: "Email address",
     cta: "Subscribe",
+    submitting: "Subscribing…",
+    success: "Thanks for subscribing! Keep an eye on your inbox.",
+    errorGeneric: "Something went wrong. Please try again later.",
     imageAlt: "",
   },
   footer: {

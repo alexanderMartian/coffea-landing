@@ -468,6 +468,9 @@ async function rules(page, width) {
       if (width < 1024) {
         const tap = all.filter((el) => el.matches("a[href], button, input:not([type=hidden]), select, textarea, [role=button], summary"))
           .filter((el) => getComputedStyle(el).display !== "inline")
+          // Not for people: honeypots / hidden controls (aria-hidden, inert, tabindex=-1 off-screen).
+          .filter((el) => !el.closest("[aria-hidden=true], [inert]"))
+          .filter((el) => { const r = el.getBoundingClientRect(); return !(el.tabIndex < 0 && (r.right <= 0 || r.left >= innerWidth)); })
           .filter((el) => { const r = el.getBoundingClientRect(); return r.width < 44 || r.height < 44; });
         if (tap.length) issues.push(`tap target < 44px: ${tap.slice(0, 3).map((el) => { const r = el.getBoundingClientRect(); return `${window.__label(el)} ${Math.round(r.width)}×${Math.round(r.height)}`; }).join(" | ")}`);
       }
