@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Coffea
 
-## Getting Started
+A concept landing page for a coffee shop. Portfolio project, not a real business.
 
-First, run the development server:
+**Live:** https://coffea-landing.vercel.app
+
+![Coffea first screen at 1440 px](docs/preview.png)
+
+## Results
+
+PageSpeed Insights, production, mobile (2026-11-03): Performance 96, Accessibility 100, Best Practices 100, SEO 100.
+
+## What's inside
+
+- Responsive from 360 to 2560 px, built from a desktop-only Figma design
+- WCAG 2.2 AA: keyboard navigation, visible focus, reduced motion, screen-reader labels
+- Scroll-reveal and hover animations in plain CSS; the first screen is never animated
+- Newsletter form with validation, a honeypot field and Resend delivery
+- Security headers
+- SEO: metadata, OG image, sitemap, robots, JSON-LD
+- Vercel Web Analytics (cookieless)
+
+## Stack
+
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, React Hook Form + Zod, Resend, Vercel.
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local   # optional, only needed for the newsletter form
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site runs at http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Credits
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Design: ["Coffea – Free Responsive Coffee Shop Website Template"](https://www.figma.com/community/file/1521850636801222788/coffea-free-responsive-coffee-shop-website-template) by Codexse, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Adapted: responsive layout, copy and interactions.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Development: Oleksandr Martian.

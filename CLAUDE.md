@@ -12,7 +12,7 @@ Package: portfolio (no client). Live URL: https://coffea-landing.vercel.app
 - Figma file: Coffea - Free Responsive Coffee Shop Website Template (Community)   <!-- figma-import checks it against the file open in Figma -->
 - Figma link: https://www.figma.com/community/file/1521850636801222788/coffea-free-responsive-coffee-shop-website-template (Community template by Codexse, codexse.com, CC BY 4.0; built from a private copy in my drafts)
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
-- Phase: qa   <!-- scaffold | build | qa | done -->
+- Phase: done   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
 - PageSpeed Insights (production, 2026-11-03): mobile 96, a11y/BP/SEO 100, LCP 2.7 s, CLS 0
 
@@ -26,7 +26,7 @@ Package: portfolio (no client). Live URL: https://coffea-landing.vercel.app
 | 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 3.9% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |
 | 6 | Testimonials | `testimonials` | `2013:8` | ✅ | spec 34/34; pixel diff 6.8% (avatar photo + placeholder content); uppercase heading; Reggae One added; mobile stack; text-box trim |
 | 7 | Newsletter | `newsletter` | `0:239` | ✅ | spec 38/38; pixel diff 1.5%; mix-blend-multiply on bean photos; mobile stacked form; typos fixed: "ger"→"get", "in get"→"and get" |
-| 8 | Footer | `footer` | `2013:9` | ✅ | spec 49/49; pixel diff 2.3% (red only on fixed typos); columns from Figma gaps; small-caps logo; social SVG icons; logo "Coffee" vs header "Coffea" — open question |
+| 8 | Footer | `footer` | `2013:9` | ✅ | spec 49/49; pixel diff 2.3% (red only on fixed typos); columns from Figma gaps; small-caps logo; social SVG icons; logo "Coffee" vs header "Coffea" — open question; design credit line added (CC BY 4.0) |
 
 Status: ⬜ not started · 🔄 in progress · ✅ done (spec match at 1920 + rules OK at 360–2560 + lint/typecheck + committed)
 

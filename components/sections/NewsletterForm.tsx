@@ -64,7 +64,7 @@ export default function NewsletterForm({
           {/* Input pill — data-spec on the pill wrapper to match Figma Frame 20 */}
           <div
             data-spec="newsletter-input"
-            className="relative flex items-center w-full min-h-[44px] md:flex-1 3xl:flex-none 3xl:w-[364px] 3xl:h-[44px] rounded-[100px] bg-background pl-6 pr-4 3xl:py-[10px] 3xl:pr-[190px] focus-within:ring-2 focus-within:ring-foreground/60 transition-shadow"
+            className="relative flex items-center w-full min-h-[44px] md:flex-1 3xl:flex-none 3xl:w-[364px] 3xl:h-[44px] rounded-[100px] bg-background pl-6 pr-4 3xl:py-[10px] focus-within:ring-2 focus-within:ring-foreground/60 transition-shadow"
           >
             <Mail
               className="shrink-0 mr-[10px] text-foreground pointer-events-none"
@@ -78,7 +78,7 @@ export default function NewsletterForm({
               placeholder={placeholder}
               aria-invalid={emailError ? true : undefined}
               aria-describedby={emailError ? "newsletter-email-error" : undefined}
-              className="flex-1 min-w-0 min-h-[44px] 3xl:min-h-0 bg-transparent font-alt font-semibold text-base text-foreground placeholder:text-foreground focus:outline-none"
+              className="flex-1 min-w-0 min-h-[44px] 3xl:min-h-0 bg-transparent font-alt font-semibold text-base text-foreground placeholder:text-foreground focus:outline-none autofill:shadow-[inset_0_0_0_1000px_var(--color-background)] autofill:[-webkit-text-fill-color:var(--color-foreground)]"
               {...register("email")}
             />
           </div>

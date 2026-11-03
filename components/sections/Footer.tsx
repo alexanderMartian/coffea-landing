@@ -91,6 +91,26 @@ export default function Footer({ className }: { className?: string }) {
           </div>
 
         </div>
+
+        <p className="mt-8 font-alt text-sm text-white/70">
+          <a
+            href={site.footer.credit.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whitespace-nowrap underline underline-offset-2 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            {site.footer.credit.text}
+          </a>
+          {" · "}
+          <a
+            href={site.footer.credit.licenseHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whitespace-nowrap underline underline-offset-2 hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            {site.footer.credit.license}
+          </a>
+        </p>
       </div>
     </footer>
   );

@@ -299,6 +299,12 @@ export const site = {
   },
   footer: {
     logo: "Coffea",
+    credit: {
+      text: "Design: Coffea template by Codexse",
+      href: "https://www.figma.com/community/file/1521850636801222788/coffea-free-responsive-coffee-shop-website-template",
+      license: "CC BY 4.0",
+      licenseHref: "https://creativecommons.org/licenses/by/4.0/",
+    },
     columns: [
       {
         heading: "PRIVACY",
