@@ -10,7 +10,7 @@ Package: portfolio (no client). Live URL: <not deployed yet>
 <!-- Filled at project start by /landing; updated after every section. The only source of truth for progress. -->
 - Business: Coffea — coffee shop / café (fictional, template)
 - Figma file: Coffea - Free Responsive Coffee Shop Website Template (Community)   <!-- figma-import checks it against the file open in Figma -->
-- Figma link: <add the link of the copy> — a copy in my drafts, read through the Figma MCP Bridge plugin
+- Figma link: https://www.figma.com/community/file/1521850636801222788/coffea-free-responsive-coffee-shop-website-template (Community template by Codexse, codexse.com, CC BY 4.0; built from a private copy in my drafts)
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
 - Phase: qa   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
@@ -87,6 +87,8 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - Code review 2026-11-03: `aria-label` strings stay in components (a11y strings, not page copy); original Promo PNGs kept
   on purpose (next/image serves avif/webp); `overflow-hidden` on Promo root is part of the design; keyboard access to the
   menu carousel goes through the card buttons (row is `role="region"` + `aria-label`, no `tabIndex`).
+- Texts were replaced with portfolio copy (client-copy), so the `section-check` texts check does not match the design —
+  expected (2026-11-03).
 - Footer logo is "Coffea" (site.ts); `design/footer.spec.json` still says "Coffee" (Figma template typo).
 
 ## Definition of Done
