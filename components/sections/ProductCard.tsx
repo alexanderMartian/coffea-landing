@@ -53,7 +53,7 @@ export default function ProductCard({
           <Heart
             data-spec={s && `${s}-card-heart`}
             size={33}
-            className="stroke-[#f1f0ee] fill-none"
+            className="stroke-background fill-none"
             aria-hidden
           />
         </button>

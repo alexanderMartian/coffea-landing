@@ -289,6 +289,12 @@ export const site = {
     errorGeneric: "Something went wrong. Please try again later.",
     imageAlt: "",
   },
+  notFound: {
+    heading: "Page not found",
+    text: "The page you are looking for does not exist or has been moved.",
+    cta: "Back to home",
+    ctaHref: "/",
+  },
   footer: {
     logo: "Coffea",
     columns: [

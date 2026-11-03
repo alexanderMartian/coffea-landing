@@ -83,7 +83,11 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - Promo/Newsletter photos keep `mix-blend-multiply` and are not animated (2026-11-02).
 - Lighthouse mobile 86–87 accepted (A/B showed the animations cost nothing; `inlineCss` was tried and made it worse;
   `zod/mini` skipped). Recheck with PageSpeed Insights after deploy.
-- `motion` package stays installed but unused for now — decide at the end.
+- `motion` package removed (unused; animations are CSS-only) (2026-11-03).
+- Code review 2026-11-03: `aria-label` strings stay in components (a11y strings, not page copy); original Promo PNGs kept
+  on purpose (next/image serves avif/webp); `overflow-hidden` on Promo root is part of the design; keyboard access to the
+  menu carousel goes through the card buttons (row is `role="region"` + `aria-label`, no `tabIndex`).
+- Footer logo is "Coffea" (site.ts); `design/footer.spec.json` still says "Coffee" (Figma template typo).
 
 ## Definition of Done
 1. Section/feature done → `pnpm lint` and `pnpm typecheck` pass.

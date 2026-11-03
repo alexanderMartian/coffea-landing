@@ -65,6 +65,8 @@
   --text-h3--line-height: 1.344;
 
   /* Brand colors */
+  --color-star: #ffb921;
+  --color-star-muted: #cecece;
   --color-warm-surface: #e2d9c8;
   --color-warm-text: #544a3e;
   --color-dark-roast: #2a0000;

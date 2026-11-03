@@ -49,7 +49,9 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   alternates: { canonical: "/" },
-  robots: IS_PRODUCTION ? { index: true, follow: true } : { index: false, follow: false },
+  robots: IS_PRODUCTION
+    ? { index: true, follow: true }
+    : { index: false, follow: false },
   openGraph: {
     type: "website",
     url: "/",
@@ -80,16 +82,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${playfair.variable} ${outfit.variable} ${poppins.variable} ${reggae.variable} h-full antialiased motion-safe:scroll-smooth`}
       data-scroll-behavior="smooth"
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
-          />
-          <Header />
-          {children}
-          <Footer />
-          <RevealObserver />
-        </body>
+      {/* suppressHydrationWarning: browser extensions inject attributes into <body> before hydration */}
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+        <Header />
+        {children}
+        <Footer />
+        <RevealObserver />
+      </body>
     </html>
   );
 }

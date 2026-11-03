@@ -30,6 +30,8 @@ export default function CarouselRow({ children }: { children: React.ReactNode })
 
       <div
         ref={rowRef}
+        role="region"
+        aria-label="Menu items"
         className="flex overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory
                    gap-1 lg:mx-[4.5rem] 3xl:mx-[8.875rem]"
       >
