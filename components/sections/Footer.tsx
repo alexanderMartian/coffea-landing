@@ -45,7 +45,7 @@ export default function Footer({ className }: { className?: string }) {
                   <ul className="mt-4 3xl:mt-6 flex flex-col gap-3 3xl:gap-[15px]">
                     {col.links.map((link, j) => (
                       <li key={link.label}>
-                        {/* TODO: replace # with real URLs */}
+                        {/* TODO: replace / with real URLs */}
                         <a
                           href={link.href}
                           data-spec={i === 0 && j === 0 ? "footer-privacy-link" : undefined}
@@ -92,7 +92,7 @@ export default function Footer({ className }: { className?: string }) {
 
         </div>
 
-        <p className="mt-8 font-alt text-sm text-white/70">
+        <p className="mt-8 font-alt text-sm text-white/70 md:text-right">
           <a
             href={site.footer.credit.href}
             target="_blank"
