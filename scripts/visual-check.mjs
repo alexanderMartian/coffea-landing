@@ -464,11 +464,16 @@ for (const path of paths) {
     await page.evaluate(LABEL);
     const hidden = await page.evaluate(HIDDEN_BLOCKS);
     const mo = await motionReport(page);
-    const smooth = await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior === "smooth");
+    // Smooth scrolling anywhere: the page (<html>) and scroll containers such as carousels (`scroll-smooth` class).
+    const smooth = await page.evaluate(() =>
+      [document.documentElement, ...document.querySelectorAll("body *")]
+        .filter((el) => getComputedStyle(el).scrollBehavior === "smooth")
+        .slice(0, 3)
+        .map((el) => (el === document.documentElement ? "<html>" : window.__label(el))));
     await page.close();
     if (mo.moving.length) problems.push(`reduced motion: still moves (wrap in motion-safe: / @media (prefers-reduced-motion: no-preference)): ${mo.moving.slice(0, 3).join(" | ")}`);
     if (hidden.length) problems.push(`reduced motion: invisible after scroll: ${hidden.join(" | ")}`);
-    if (smooth) problems.push("reduced motion: smooth scrolling is still on (use motion-safe:scroll-smooth)");
+    if (smooth.length) problems.push(`reduced motion: smooth scrolling is still on (use motion-safe:scroll-smooth; JS scrollTo/scrollBy → behavior "auto" when reduced): ${smooth.join(" | ")}`);
   } catch (e) {
     problems.push(`reduced motion: check failed (${e.message.split("\n")[0]})`);
   }

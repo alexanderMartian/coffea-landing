@@ -133,6 +133,8 @@ Use in sections (Server Components):
 `motion-safe:` keeps instant jumps for people with reduced motion. Check the bundled Next docs about
 `data-scroll-behavior` (Next disables smooth scrolling during route changes when it is set).
 A fixed/sticky header covering the target → `scroll-mt-*` on the target section.
+Scroll containers (carousels) follow the same rule: `motion-safe:scroll-smooth`, never plain `scroll-smooth`; in JS
+`el.scrollBy({ left, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })`.
 
 ## 4. Hover and press
 Buttons and links (color only — cheap, not "motion" for WCAG):
