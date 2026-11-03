@@ -31,6 +31,7 @@ export const site = {
   },
   coffeeMenu: {
     title: "our special coffee",
+    carouselLabel: "Coffee menu",
     items: [
       {
         image: "/images/coffee-menu/card-1.jpg",
@@ -108,6 +109,7 @@ export const site = {
   },
   dessertMenu: {
     title: "our special dessert",
+    carouselLabel: "Dessert menu",
     items: [
       {
         image: "/images/dessert-menu/card-1.jpg",

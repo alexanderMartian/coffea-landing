@@ -15,12 +15,14 @@ export default function Home() {
         id="coffee-menu"
         className="mt-section-lg"
         title={site.coffeeMenu.title}
+        carouselLabel={site.coffeeMenu.carouselLabel}
         items={site.coffeeMenu.items}
       />
       <ProductSection
         id="dessert-menu"
         className="mt-section-lg"
         title={site.dessertMenu.title}
+        carouselLabel={site.dessertMenu.carouselLabel}
         items={site.dessertMenu.items}
       />
       <Promo className="mt-section-sm" />

@@ -15,12 +15,14 @@ interface ProductItem {
 interface Props {
   id: string;
   title: string;
+  /** Accessible name of the scrollable card row; must differ between sections. */
+  carouselLabel: string;
   items: readonly ProductItem[];
   /** margin-top token class, e.g. "mt-section-lg". Passed from page.tsx, not hard-coded. */
   className?: string;
 }
 
-export default function ProductSection({ id, title, items, className }: Props) {
+export default function ProductSection({ id, title, carouselLabel, items, className }: Props) {
   return (
     <section id={id} className={cn("overflow-x-clip", className)}>
       <div className="mx-auto w-full max-w-[110rem] px-4 md:px-8 3xl:px-0">
@@ -33,7 +35,7 @@ export default function ProductSection({ id, title, items, className }: Props) {
         </Reveal>
 
         <Reveal>
-          <CarouselRow>
+          <CarouselRow label={carouselLabel}>
             {items.map((item, i) => (
               <ProductCard key={i} {...item} specPrefix={i === 0 ? id : ""} />
             ))}

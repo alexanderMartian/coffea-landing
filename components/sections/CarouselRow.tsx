@@ -3,15 +3,34 @@
 import { useRef } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-export default function CarouselRow({ children }: { children: React.ReactNode }) {
+export default function CarouselRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   const rowRef = useRef<HTMLDivElement>(null);
 
   function scroll(dir: 1 | -1) {
     const row = rowRef.current;
     if (!row) return;
+    const behavior: ScrollBehavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth";
+    const max = row.scrollWidth - row.clientWidth;
+    // Rewind at the ends: the last card wraps to the first, the first wraps to the last
+    if (dir === 1 && row.scrollLeft >= max - 2) {
+      row.scrollTo({ left: 0, behavior });
+      return;
+    }
+    if (dir === -1 && row.scrollLeft <= 2) {
+      row.scrollTo({ left: max, behavior });
+      return;
+    }
     const card = row.firstElementChild as HTMLElement | null;
     // gap-1 = 4 px
-    row.scrollBy({ left: dir * ((card?.offsetWidth ?? 300) + 4), behavior: "smooth" });
+    row.scrollBy({ left: dir * ((card?.offsetWidth ?? 300) + 4), behavior });
   }
 
   return (
@@ -31,8 +50,8 @@ export default function CarouselRow({ children }: { children: React.ReactNode })
       <div
         ref={rowRef}
         role="region"
-        aria-label="Menu items"
-        className="flex overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory
+        aria-label={label}
+        className="flex overflow-x-auto no-scrollbar motion-safe:scroll-smooth snap-x snap-mandatory
                    gap-1 lg:mx-[4.5rem] 3xl:mx-[8.875rem]"
       >
         {children}
