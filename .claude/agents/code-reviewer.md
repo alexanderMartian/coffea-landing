@@ -41,7 +41,9 @@ Allowed commands: `git status`, `git diff`, `git log`, `git ls-files`, `git bran
 - Server Components by default; `"use client"` as low in the tree as possible; client components get only the props
   they need (not the whole `site` object); no heavy library in client code without need.
 - No `useEffect` for what CSS or server code can do; effects clean up (observers, listeners, timers).
-- `next/image` with real `sizes`; a `fill` image's direct parent is positioned (`relative`); only the LCP image gets
+- `next/image` with real `sizes` (the slot width per breakpoint — see figma-import `breakpoints.md` → Media; a
+  carousel of 4 cards is `25vw`, not `33vw`); a full-bleed hero has laptop steps in `images.deviceSizes`
+  (1280/1440/1600); a `fill` image's direct parent is positioned (`relative`); only the LCP image gets
   `loading="eager"` + `fetchPriority="high"` (`priority` is deprecated in Next 16). `next/link` between pages.
 - Fonts via `next/font`: only used weights; `preload` only for fonts above the fold.
 - Third-party scripts via `next/script` with a deferred strategy.

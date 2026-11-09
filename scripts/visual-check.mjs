@@ -388,7 +388,7 @@ for (const path of paths) {
     const mo = await motionReport(page);
     await setPhase(page, "interact");
 
-    const r = await page.evaluate(() => {
+    const r = await page.evaluate(async () => {
       const vw = document.documentElement.clientWidth;
       const overflowX = document.documentElement.scrollWidth > vw + 1;
       const offenders = [];
@@ -405,6 +405,34 @@ for (const path of paths) {
       const imgs = [...document.images];
       const broken = imgs.filter((i) => i.complete && i.naturalWidth === 0).map((i) => (i.currentSrc || i.src).slice(0, 100));
       const noAlt = imgs.filter((i) => !i.hasAttribute("alt")).length;
+      // Responsive images (srcset, i.e. next/image) that download a file much wider than they are shown → `sizes`
+      // claims a bigger slot than the layout gives. object-cover is respected: a tall box needs a wider file.
+      const fileOf = (src) => {
+        try {
+          const u = new URL(src, location.href);
+          return decodeURIComponent(u.searchParams.get("url") || u.pathname).split("/").slice(-2).join("/");
+        } catch { return src.slice(0, 60); }
+      };
+      // With srcset, naturalWidth is density-corrected (≈ the slot `sizes` promised), and the `w` descriptor can be
+      // larger than the file (next/image never upscales the original), so the real width is read from the file itself.
+      const fileWidth = (i) => new Promise((done) => {
+        const probe = new Image();
+        probe.onload = () => done(probe.naturalWidth);
+        probe.onerror = () => done(i.naturalWidth);
+        probe.src = i.currentSrc;
+      });
+      const oversized = [];
+      for (const i of imgs) {
+        if (!i.srcset || !i.complete || !i.naturalWidth || !i.currentSrc) continue;
+        const r = i.getBoundingClientRect();
+        if (r.width < 64 || r.height < 64) continue;
+        const fileW = await fileWidth(i);
+        const cover = getComputedStyle(i).objectFit === "cover";
+        const needed = Math.max(r.width, cover ? (r.height * i.naturalWidth) / i.naturalHeight : 0) * (window.devicePixelRatio || 1);
+        if (fileW > needed * 1.5 && fileW - needed > 100) {
+          oversized.push(`${fileOf(i.currentSrc)} loads ${fileW}w, shown ${Math.round(r.width)}px`);
+        }
+      }
       const h1 = document.querySelectorAll("h1").length;
       const transitionAll = [...document.querySelectorAll("body *")].filter((el) => {
         const s = getComputedStyle(el);
@@ -415,6 +443,7 @@ for (const path of paths) {
       const placeholders = anchors.filter((h) => h === "#").length;
       return {
         overflowX, offenders: offenders.map(window.__label), broken, noAlt, h1, deadAnchors, placeholders,
+        oversized: [...new Set(oversized)],
         transitionAll: { count: transitionAll.length, some: transitionAll.slice(0, 3).map(window.__label) },
       };
     });
@@ -422,6 +451,7 @@ for (const path of paths) {
     if (r.overflowX) problems.push(`horizontal overflow; wider than viewport: ${r.offenders.join(" | ") || "unknown element"}`);
     if (r.broken.length) problems.push(`broken images: ${r.broken.join(", ")}`);
     if (r.noAlt) problems.push(`${r.noAlt} <img> without alt attribute`);
+    if (r.oversized.length) problems.push(`images much wider than shown (fix \`sizes\` to the real slot width): ${r.oversized.slice(0, 3).join(" | ")}${r.oversized.length > 3 ? ` … +${r.oversized.length - 3}` : ""}`);
     if (r.h1 !== 1) problems.push(`${r.h1} <h1> elements (expected 1)`);
     if (hiddenBlocks.length) problems.push(`invisible after scroll (opacity 0, stuck reveal?): ${hiddenBlocks.join(" | ")}`);
     // Motion

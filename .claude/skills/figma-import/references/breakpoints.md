@@ -111,7 +111,15 @@ Figma section frames often sit at a distance from each other; that distance is n
 
 ## Media
 - Keep the Figma ratio: `aspect-[w/h]` with `next/image fill` + `sizes`.
-- `sizes` follows the layout: `(min-width: 1024px) 50vw, 100vw` for a split; `(min-width: 1920px) 1920px, 100vw` for full-bleed.
+- `sizes` = the image's **real width at every breakpoint** — the browser picks the file from it before layout, so a
+  too-big `sizes` downloads a too-big file. Derive it from the layout, not by eye:
+  - split: `(min-width: 1024px) 50vw, 100vw`; full-bleed: `(min-width: 1920px) 1920px, 100vw`;
+  - grid / carousel of N cards: slot ≈ (container − gaps) / N per breakpoint, e.g. 4 visible cards from `lg:` and
+    2 from `md:` → `(min-width: 1920px) 366px, (min-width: 1024px) 25vw, (min-width: 768px) 50vw, 85vw`
+    (a fixed 1920 design width → px; a carousel showing 85 % of a card on phones → `85vw`).
+  - Check: `visual-check` reports "images much wider than shown" when a file is > 1.5× its rendered width.
+- Full-bleed hero on laptops: Next's default device sizes jump 1200 → 1920, so a 1280–1440 screen downloads 1920w.
+  Add the steps in `next.config.ts`: `images.deviceSizes: [640, 750, 828, 1080, 1200, 1280, 1440, 1600, 1920, 2048, 3840]`.
 - Large media in a split → full width on mobile, can switch to a shorter ratio (`aspect-[4/3]` → `aspect-video`) if the block gets too tall.
 
 ## Touch and forms (< 1024)

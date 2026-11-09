@@ -429,7 +429,7 @@ async function pixelDiff(oursB64, designB64) {
 // ---------- layout rules ----------
 async function rules(page, width) {
   return page.evaluate(
-    ({ sid, width }) => {
+    async ({ sid, width }) => {
       const section = document.getElementById(sid);
       const vw = document.documentElement.clientWidth;
       const issues = [];
@@ -496,10 +496,23 @@ async function rules(page, width) {
         }
       }
       if (pairs.length) issues.push(`overlapping text: ${pairs.join(" | ")}`);
-      // 6. upscaled (blurry) images
-      const up = [...section.querySelectorAll("img")].filter(window.__visible)
-        .filter((i) => i.naturalWidth > 0 && i.getBoundingClientRect().width > i.naturalWidth * 1.05);
-      if (up.length) issues.push(`image upscaled: ${up.slice(0, 2).map((i) => `${(i.currentSrc || i.src).split("/").pop().slice(0, 40)} ${i.naturalWidth}px→${Math.round(i.getBoundingClientRect().width)}px`).join(" | ")}`);
+      // 6. upscaled (blurry) images. With srcset, img.naturalWidth is density-corrected (e.g. a 2560px original served
+      //    for a 3840w candidate reports 1706), so the real pixel width is read from the file itself (cached request).
+      const realWidth = (i) => new Promise((done) => {
+        if (!i.srcset) return done(i.naturalWidth);
+        const probe = new Image();
+        probe.onload = () => done(probe.naturalWidth);
+        probe.onerror = () => done(i.naturalWidth);
+        probe.src = i.currentSrc || i.src;
+      });
+      const up = [];
+      for (const i of [...section.querySelectorAll("img")].filter(window.__visible)) {
+        if (!i.naturalWidth) continue;
+        const w = await realWidth(i);
+        const shown = i.getBoundingClientRect().width;
+        if (shown > w * 1.05) up.push(`${decodeURIComponent(i.currentSrc || i.src).split("/").pop().slice(0, 40)} ${w}px→${Math.round(shown)}px`);
+      }
+      if (up.length) issues.push(`image upscaled: ${up.slice(0, 2).join(" | ")}`);
       // 7. invisible blocks (stuck enter animation)
       const ghost = [...section.querySelectorAll("*")].filter((el) => { const r = el.getBoundingClientRect(); return r.height > 40 && Number(getComputedStyle(el).opacity) < 0.05; });
       if (ghost.length) issues.push(`invisible (opacity 0): ${ghost.slice(0, 2).map(window.__label).join(" | ")}`);
