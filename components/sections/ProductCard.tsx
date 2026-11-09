@@ -40,7 +40,7 @@ export default function ProductCard({
             alt={imageAlt}
             fill
             className="object-cover transition-[scale] duration-(--motion-base) ease-standard motion-safe:group-hover/card:scale-105"
-            sizes="(min-width: 1920px) 366px, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 85vw"
+            sizes="(min-width: 1920px) 332px, (min-width: 1024px) calc((min(100vw - 4rem, 110rem) - 9rem) / 3 - 38px), (min-width: 768px) calc(50vw - 70px), calc((100vw - 2rem) * 0.85 - 34px)"
           />
         </div>
         {/* TODO: favorites logic */}

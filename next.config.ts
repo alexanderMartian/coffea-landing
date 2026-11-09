@@ -5,7 +5,10 @@ const csp = "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  images: { formats: ["image/avif", "image/webp"] },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1280, 1440, 1600, 1920, 2048, 3840],
+  },
   cacheComponents: true,
   partialPrefetching: true,
   async headers() {
