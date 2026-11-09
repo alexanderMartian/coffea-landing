@@ -26,7 +26,7 @@ Package: portfolio (no client). Live URL: https://coffea-landing.vercel.app
 | 5 | Promo | `promo` | `2013:7` | ✅ | mix-blend-multiply on cutout photos; pixel diff 3.9% (photo rendering); CTA "Explore Our Products" (Figma typo "Out") |
 | 6 | Testimonials | `testimonials` | `2013:8` | ✅ | spec 32/34, pixel diff ~9% (avatar photo + placeholder content); +28 px on 1920 (card-active, dots) from the "Sample reviews" line — accepted, expected; uppercase heading; Reggae One added; mobile stack; text-box trim |
 | 7 | Newsletter | `newsletter` | `0:239` | ✅ | spec 38/38; pixel diff 1.5%; mix-blend-multiply on bean photos; mobile stacked form; typos fixed: "ger"→"get", "in get"→"and get" |
-| 8 | Footer | `footer` | `2013:9` | ✅ | spec 49/49; pixel diff 2.3% (red only on fixed typos); columns from Figma gaps; small-caps logo; social SVG icons; logo "Coffee" vs header "Coffea" — open question; design credit line added (CC BY 4.0) |
+| 8 | Footer | `footer` | `2013:9` | ✅ | spec 49/49; pixel diff 2.3% (red only on fixed typos); columns from Figma gaps; small-caps logo; social SVG icons; logo "Coffea" (Figma had "Coffee" — template typo, resolved); design credit line added (CC BY 4.0) |
 
 Status: ⬜ not started · 🔄 in progress · ✅ done (spec match at 1920 + rules OK at 360–2560 + lint/typecheck + committed)
 
