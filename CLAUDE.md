@@ -90,6 +90,8 @@ GSAP only if the client asked for it. Sanity CMS only in the Premium package.
 - Texts were replaced with portfolio copy (client-copy), so the `section-check` texts check does not match the design —
   expected (2026-11-03).
 - Vercel Web Analytics (cookieless, no consent banner) (2026-11-03).
+- Reggae One is served as a glyph subset for "Come and Join" (2 KB); the latin file stays in the repo as the source;
+  regenerate when the eyebrow text changes (2026-11-09).
 - Footer logo is "Coffea" (site.ts); `design/footer.spec.json` still says "Coffee" (Figma template typo).
 
 ## Definition of Done

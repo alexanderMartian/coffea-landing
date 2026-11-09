@@ -192,6 +192,7 @@ export const site = {
     ctaHref: "#coffee-menu",
   },
   testimonials: {
+    // Font subset: changing this text requires regenerating app/fonts/reggae-one-subset.woff2 (see app/layout.tsx).
     eyebrow: "Come and Join",
     heading: "our happy customers",
     sampleNote: "Sample reviews — Coffea is a concept project.",

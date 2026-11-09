@@ -28,10 +28,12 @@ const poppins = Poppins({
   preload: false,
 });
 
-// Latin slice only: the Google CSS ships ~120 Japanese @font-face rules we never use.
+// Subset: only the glyphs of site.testimonials.eyebrow ("Come and Join") — 2 KB instead of 21 KB.
+// Changing that text? Regenerate from reggae-one-latin.woff2 (the source, kept in the repo) with fontTools:
+// pyftsubset app/fonts/reggae-one-latin.woff2 --text="<new text>" --flavor=woff2 --layout-features="*" --output-file=app/fonts/reggae-one-subset.woff2
 // License: app/fonts/OFL.txt
 const reggae = localFont({
-  src: "./fonts/reggae-one-latin.woff2",
+  src: "./fonts/reggae-one-subset.woff2",
   variable: "--font-reggae-var",
   weight: "400",
   display: "swap",
