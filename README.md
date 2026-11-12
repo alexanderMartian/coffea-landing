@@ -6,9 +6,13 @@ A concept landing page for a coffee shop. Portfolio project, not a real business
 
 ![Coffea first screen at 1440 px](docs/preview.png)
 
+![Coffea on mobile: hero, menu and newsletter](docs/mobile.png)
+
 ## Results
 
-PageSpeed Insights, production, mobile (2026-11-03): Performance 96, Accessibility 100, Best Practices 100, SEO 100.
+PageSpeed Insights, production (2026-11-09):
+- Mobile: Performance 99, Accessibility 100, Best Practices 100, SEO 100
+- Desktop: Performance 100, Accessibility 100, Best Practices 100, SEO 100
 
 ## What's inside
 

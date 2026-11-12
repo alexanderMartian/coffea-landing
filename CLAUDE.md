@@ -14,7 +14,7 @@ Package: portfolio (no client). Live URL: https://coffea-landing.vercel.app
 - Design frame: 0:3, 1920×4343   <!-- filled by figma-import step 1 -->
 - Phase: done   <!-- scaffold | build | qa | done -->
 - Tokens: ✅   <!-- ✅ when colors, fonts, type scale and spacing are in app/globals.css -->
-- PageSpeed Insights (production, 2026-11-03): mobile 96, a11y/BP/SEO 100, LCP 2.7 s, CLS 0
+- PageSpeed Insights (production, 2026-11-09): mobile — Performance 99, Accessibility 100, Best Practices 100, SEO 100; desktop — Performance 100, Accessibility 100, Best Practices 100, SEO 100
 
 | # | Section | id | Figma node | Status | Notes |
 |---|---|---|---|---|---|
